@@ -1,0 +1,29 @@
+{
+  "name": "ferreagro-el-conuco",
+  "version": "1.0.0",
+  "description": "Sistema de catálogo, carrito y administración para venta de alimentos agrícolas y para animales",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx live-server --port=3000 --open=/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TU_USUARIO/ferreagro-el-conuco.git"
+  },
+  "keywords": [
+    "agriculture",
+    "animal-feed",
+    "ecommerce",
+    "catalog",
+    "venezuela",
+    "inventory",
+    "pos"
+  ],
+  "author": "Ferreagro El Conuco",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TU_USUARIO/ferreagro-el-conuco/issues"
+  },
+  "homepage": "https://TU_USUARIO.github.io/ferreagro-el-conuco"
+}

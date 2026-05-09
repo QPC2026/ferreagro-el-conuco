@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ferreagro El Conuco - Alimentos para Animales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            green: '#2D7D32',
+                            lightgreen: '#4CAF50',
+                            orange: '#F57C00',
+                            lightorange: '#FF9800',
+                            cream: '#FFF8E1',
+                            dark: '#1B5E20'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { scrollbar-width: thin; scrollbar-color: #2D7D32 #f1f1f1; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #2D7D32; border-radius: 4px; }
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(45,125,50,0.15); }
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .pulse-green { animation: pulseGreen 2s infinite; }
+        @keyframes pulseGreen { 0%,100% { box-shadow: 0 0 0 0 rgba(45,125,50,0.4); } 50% { box-shadow: 0 0 0 10px rgba(45,125,50,0); } }
+        .logo-svg { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+        input:focus, select:focus { outline: none; border-color: #2D7D32; box-shadow: 0 0 0 3px rgba(45,125,50,0.1); }
+        .admin-sidebar { transition: all 0.3s; }
+        .tab-active { border-bottom: 3px solid #2D7D32; color: #2D7D32; font-weight: 600; }
+        .progress-bar { transition: width 0.5s ease; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+<div id="app">
+
+    <header class="sticky top-0 z-50 glass border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="router.navigate('home')">
+                    <svg class="logo-svg w-10 h-10" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Outer ring -->
+                        <circle cx="50" cy="50" r="48" fill="#2D7D32"/>
+                        <circle cx="50" cy="50" r="44" fill="none" stroke="#FFF8E1" stroke-width="1" opacity="0.25"/>
+                        <!-- Field furrows (conuco) - curved horizontal lines -->
+                        <path d="M6 52 Q25 42 50 52 Q75 62 94 52" fill="none" stroke="#1B5E20" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+                        <path d="M10 60 Q28 50 50 60 Q72 70 90 60" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+                        <path d="M14 68 Q30 58 50 68 Q70 78 86 68" fill="none" stroke="#1B5E20" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+                        <!-- Central plant stem -->
+                        <path d="M50 72 L50 38" fill="none" stroke="#4CAF50" stroke-width="3" stroke-linecap="round"/>
+                        <!-- Leaves -->
+                        <path d="M50 55 Q35 48 32 40 Q40 46 50 52" fill="#66BB6A"/>
+                        <path d="M50 48 Q65 41 68 33 Q60 39 50 45" fill="#66BB6A"/>
+                        <path d="M50 42 Q42 34 44 26 Q48 34 50 38" fill="#81C784"/>
+                        <!-- Corn cob / grain -->
+                        <ellipse cx="50" cy="30" rx="4.5" ry="9" fill="#F57C00"/>
+                        <ellipse cx="50" cy="30" rx="2.5" ry="6" fill="#FF9800"/>
+                        <!-- Small chicken silhouette integrated at bottom right -->
+                        
+                        
+                        
+                    </svg>
+                    <div>
+                        <h1 class="text-xl font-bold text-brand-green leading-tight">FERREAGRO</h1>
+                        <p class="text-xl text-brand-orange font-bold tracking-wider">EL CONUCO</p>
+                    </div>
+                </div>
+
+                <nav class="hidden md:flex items-center gap-1">
+                    <button onclick="router.navigate('home')" class="nav-btn px-4 py-2 rounded-lg hover:bg-brand-green/10 text-gray-700 hover:text-brand-green transition font-medium">Inicio</button>
+                    <button onclick="router.navigate('catalog')" class="nav-btn px-4 py-2 rounded-lg hover:bg-brand-green/10 text-gray-700 hover:text-brand-green transition font-medium">Catálogo</button>
+                    <button onclick="router.navigate('affiliate')" class="nav-btn px-4 py-2 rounded-lg hover:bg-brand-green/10 text-gray-700 hover:text-brand-green transition font-medium">Afíliate</button>
+                    <button onclick="router.navigate('admin')" class="nav-btn px-4 py-2 rounded-lg hover:bg-brand-green/10 text-gray-700 hover:text-brand-green transition font-medium"><i class="fas fa-lock mr-1"></i>Admin</button>
+                </nav>
+
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleCart()" class="relative p-2 rounded-full hover:bg-gray-100 transition">
+                        <i class="fas fa-shopping-cart text-brand-green text-lg"></i>
+                        <span id="cart-badge" class="absolute -top-1 -right-1 bg-brand-orange text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold hidden">0</span>
+                    </button>
+                    <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg hover:bg-gray-100">
+                        <i class="fas fa-bars text-brand-green text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100">
+            <div class="px-4 py-2 space-y-1">
+                <button onclick="router.navigate('home'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 rounded-lg hover:bg-brand-green/10">Inicio</button>
+                <button onclick="router.navigate('catalog'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 rounded-lg hover:bg-brand-green/10">Catálogo</button>
+                <button onclick="router.navigate('affiliate'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 rounded-lg hover:bg-brand-green/10">Afíliate</button>
+                <button onclick="router.navigate('admin'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 rounded-lg hover:bg-brand-green/10">Administrador</button>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="min-h-screen">
+        </main>
+
+    <footer class="bg-brand-dark text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 py-12">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg class="w-8 h-8" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#2D7D32"/><circle cx="50" cy="50" r="44" fill="none" stroke="#FFF8E1" stroke-width="1" opacity="0.25"/><path d="M6 52 Q25 42 50 52 Q75 62 94 52" fill="none" stroke="#1B5E20" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/><path d="M10 60 Q28 50 50 60 Q72 70 90 60" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" opacity="0.5"/><path d="M50 72 L50 38" fill="none" stroke="#4CAF50" stroke-width="3" stroke-linecap="round"/><path d="M50 55 Q35 48 32 40 Q40 46 50 52" fill="#66BB6A"/><path d="M50 48 Q65 41 68 33 Q60 39 50 45" fill="#66BB6A"/><path d="M50 42 Q42 34 44 26 Q48 34 50 38" fill="#81C784"/><ellipse cx="50" cy="30" rx="4.5" ry="9" fill="#F57C00"/><ellipse cx="50" cy="30" rx="2.5" ry="6" fill="#FF9800"/></svg>
+                        <span class="font-bold text-lg">FERREAGRO <span class="text-brand-orange">EL CONUCO</span></span>
+                    </div>
+                    <p class="text-green-100 text-sm">Alimentos de calidad para tus animales. Al por mayor y al detal.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3 text-brand-orange">Productos</h4>
+                    <ul class="space-y-2 text-sm text-green-100">
+                        <li>Alimento para Pollos</li>
+                        <li>Alimento para Cerdos</li>
+                        <li>Alimento para Perros</li>
+                        <li>Alimento para Gatos</li>
+                        <li>Concentrados y Maíz</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3 text-brand-orange">Servicios</h4>
+                    <ul class="space-y-2 text-sm text-green-100">
+                        <li>Despacho Gratis en García*</li>
+                        <li>Venta al Mayor</li>
+                        <li>Venta al Detal (kg)</li>
+                        <li>Programa de Puntos</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3 text-brand-orange">Contacto</h4>
+                    <ul class="space-y-2 text-sm text-green-100">
+                        <li><i class="fas fa-phone mr-2"></i>+58 412-3521113</li>
+                        <li><i class="fab fa-whatsapp mr-2 text-green-400"></i>+58 412-3521113 (WhatsApp)</li>
+                        <li><i class="fas fa-envelope mr-2"></i>ferreagroelconuco@gmail.com</li>
+                        <li><i class="fas fa-map-marker-alt mr-2"></i>Municipio García, Venezuela</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-green-700 mt-8 pt-8 text-center text-sm text-green-200">
+                © 2026 Ferreagro El Conuco. Todos los derechos reservados.
+            </div>
+        </div>
+    </footer>
+
+    <div id="cart-overlay" class="fixed inset-0 bg-black/50 z-50 hidden" onclick="toggleCart()"></div>
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+        <div class="p-4 border-b flex items-center justify-between bg-brand-green text-white">
+            <h3 class="font-bold text-lg"><i class="fas fa-shopping-cart mr-2"></i>Tu Carrito</h3>
+            <button onclick="toggleCart()" class="p-2 hover:bg-white/20 rounded-lg transition"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3">
+            </div>
+        <div class="p-4 border-t bg-gray-50">
+            <div class="space-y-2 mb-4">
+                <div class="flex justify-between text-sm"><span>Subtotal:</span><span id="cart-subtotal" class="font-semibold">$0.00</span></div>
+                <div class="flex justify-between text-sm"><span>Descuento Puntos:</span><span id="cart-discount" class="font-semibold text-brand-orange">-$0.00</span></div>
+                <div class="flex justify-between text-sm"><span>Envío:</span><span id="cart-shipping" class="font-semibold text-brand-green">Gratis</span></div>
+                <div class="border-t pt-2 flex justify-between text-lg font-bold"><span>Total:</span><span id="cart-total" class="text-brand-green">$0.00</span></div>
+            </div>
+            <button onclick="checkout()" class="w-full bg-brand-orange hover:bg-brand-lightorange text-white font-bold py-3 rounded-xl transition pulse-green">
+                <i class="fas fa-credit-card mr-2"></i>Proceder al Pago
+            </button>
+        </div>
+    </div>
+
+    <div id="checkout-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto fade-in">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-brand-green">Finalizar Compra</h2>
+                    <button onclick="closeCheckout()" class="p-2 hover:bg-gray-100 rounded-lg"><i class="fas fa-times"></i></button>
+                </div>
+
+                <div id="checkout-step-1">
+                    <div class="mb-4 p-3 bg-brand-cream rounded-lg border border-brand-orange/20">
+                        <p class="text-sm text-brand-dark"><i class="fas fa-info-circle mr-1 text-brand-orange"></i>
+                        <strong>Despacho Gratis</strong> en municipio García en compras mayores a $20.</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Nombre Completo</label>
+                            <input type="text" id="co-name" class="w-full border rounded-lg px-4 py-2" placeholder="Tu nombre">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Teléfono</label>
+                            <input type="tel" id="co-phone" class="w-full border rounded-lg px-4 py-2" placeholder="0412-XXXXXXX">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Dirección de Entrega</label>
+                            <textarea id="co-address" class="w-full border rounded-lg px-4 py-2" rows="2" placeholder="Dirección completa"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Municipio</label>
+                            <select id="co-municipio" class="w-full border rounded-lg px-4 py-2" onchange="updateShipping()">
+                                <option value="">Selecciona...</option>
+                                <option value="garcia">García (Envío Gratis*)</option>
+                                <option value="otro">Otro municipio</option>
+                            </select>
+                        </div>
+                        <div id="shipping-cost-display" class="hidden p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> Envío con costo adicional. Contactaremos para coordinar.
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="font-bold text-lg">Total a Pagar:</span>
+                            <span id="checkout-total" class="text-2xl font-bold text-brand-green">$0.00</span>
+                        </div>
+                   
+                        <button onclick="goToPayment()" class="w-full bg-brand-green hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition mb-3">
+                            Continuar al Pago <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                        <button onclick="checkoutWhatsApp()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition">
+                            <i class="fab fa-whatsapp mr-2"></i>Confirmar Pedido por WhatsApp
+                        </button>
+                    </div>
+                </div>
+
+                <div id="checkout-step-2" class="hidden">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-brand-green/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-mobile-alt text-3xl text-brand-green"></i>
+                        </div>
+                        <h3 class="text-lg font-bold">Pago Móvil</h3>
+                        <p class="text-sm text-gray-500">Realiza tu pago y sube el capture</p>
+                    </div>
+
+                    <div class="bg-brand-cream p-4 rounded-xl mb-4 border border-brand-green/20">
+                        <div class="flex justify-between mb-2"><span class="text-sm">Banco:</span><span class="font-bold">Bancrecer</span></div>
+                        <div class="flex justify-between mb-2"><span class="text-sm">Teléfono:</span><span class="font-bold">0412-3521113</span></div>
+                        <div class="flex justify-between"><span class="text-sm">Documento:</span><span class="font-bold">V6977409</span></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Referencia de Pago</label>
+                        <input type="text" id="co-ref" class="w-full border rounded-lg px-4 py-2" placeholder="Número de referencia">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Capture del Pago (opcional)</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-brand-green transition cursor-pointer" onclick="document.getElementById('co-file').click()">
+                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-sm text-gray-500">Haz clic para subir imagen</p>
+                            <input type="file" id="co-file" class="hidden" accept="image/*">
+                        </div>
+                    </div>
+
+                    <button onclick="processPayment()" class="w-full bg-brand-orange hover:bg-brand-lightorange text-white font-bold py-3 rounded-xl transition">
+                        <i class="fas fa-check mr-2"></i>Confirmar Pedido
+                    </button>
+                    <button onclick="backToStep1()" class="w-full mt-2 text-gray-500 text-sm hover:text-gray-700">← Volver</button>
+                </div>
+
+                <div id="checkout-success" class="hidden text-center py-8">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-check text-4xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-brand-green mb-2">¡Pedido Confirmado!</h3>
+                    <p class="text-gray-600 mb-4">Tu pedido ha sido registrado exitosamente.</p>
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <p class="text-sm text-gray-500">Número de orden:</p>
+                        <p class="text-xl font-bold text-brand-dark" id="order-number">#0001</p>
+                    </div>
+                    <button onclick="closeCheckout(); router.navigate('home')" class="bg-brand-green text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-dark transition">Volver al Inicio</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="affiliate-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full fade-in">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-brand-green">Programa de Afiliados</h2>
+                    <button onclick="closeAffiliateModal()" class="p-2 hover:bg-gray-100 rounded-lg"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-brand-orange/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-gift text-3xl text-brand-orange"></i>
+                    </div>
+                    <p class="text-gray-600 text-sm">Acumula puntos por cada $ gastado. Canjea tus puntos por descuentos exclusivos.</p>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="w-10 h-10 bg-brand-green/10 rounded-full flex items-center justify-center"><i class="fas fa-coins text-brand-green"></i></div>
+                        <div><p class="font-semibold text-sm">50 puntos</p><p class="text-xs text-gray-500">$5 de descuento</p></div>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="w-10 h-10 bg-brand-orange/10 rounded-full flex items-center justify-center"><i class="fas fa-coins text-brand-orange"></i></div>
+                        <div><p class="font-semibold text-sm">100 puntos</p><p class="text-xs text-gray-500">$12 de descuento</p></div>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="w-10 h-10 bg-brand-dark/10 rounded-full flex items-center justify-center"><i class="fas fa-crown text-brand-dark"></i></div>
+                        <div><p class="font-semibold text-sm">200 puntos</p><p class="text-xs text-gray-500">$30 de descuento + Envío VIP</p></div>
+                    </div>
+                </div>
+                <button onclick="router.navigate('affiliate'); closeAffiliateModal()" class="w-full mt-4 bg-brand-green hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition">
+                    Quiero Afiliarme
+                </button>
+                <a href="https://wa.me/584123521113?text=Hola%2C%20quiero%20más%20información%20sobre%20el%20programa%20de%20afiliados" 
+                   target="_blank"
+                   class="w-full mt-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition flex items-center justify-center">
+                    <i class="fab fa-whatsapp mr-2"></i>Consultar por WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+
+    <!-- Dispatch Note Modal -->
+    <div id="dispatch-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[95vh] overflow-y-auto fade-in shadow-2xl">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-brand-green"><i class="fas fa-file-invoice mr-2"></i>Nota de Despacho</h2>
+                    <button onclick="closeDispatchNote()" class="p-2 hover:bg-gray-100 rounded-lg transition"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="dispatch-content" class="bg-white border-2 border-dashed border-gray-300 rounded-xl p-2">
+                    <!-- Rendered dynamically -->
+                </div>
+                <div class="flex flex-wrap gap-3 mt-6 justify-center">
+                    <button onclick="downloadDispatchImage()" class="bg-brand-green hover:bg-brand-dark text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
+                        <i class="fas fa-image mr-2"></i>Descargar Imagen
+                    </button>
+                    <button onclick="downloadDispatchPDF()" class="bg-brand-orange hover:bg-brand-lightorange text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
+                        <i class="fas fa-file-pdf mr-2"></i>Descargar PDF
+                    </button>
+                    <button onclick="shareDispatchWhatsApp()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
+                        <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                    </button>
+                    <button onclick="sendDispatchEmail()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
+                        <i class="fas fa-envelope mr-2"></i>Email
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><script>
+// ==================== IMAGE SYSTEM ====================
+
+const DEFAULT_PRODUCT_IMAGE = 'https://placehold.co/600x600/F3F4F6/2D7D32?text=FERREAGRO';
+
+const CATEGORY_IMAGES = {
+    aves: 'https://images.unsplash.com/photo-1694854038360-56b29a16fb0c?w=600&h=600&fit=crop',
+    cerdo: 'https://images.unsplash.com/photo-1545468258-576dbac5faa9?w=600&h=600&fit=crop',
+    perro: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=600&h=600&fit=crop',
+    gato: 'https://images.unsplash.com/photo-1626544379809-e0031867d50c?w=600&h=600&fit=crop',
+    grano: 'https://images.unsplash.com/photo-1567547921486-f280c2f53b5d?w=600&h=600&fit=crop',
+    suplemento: 'https://images.unsplash.com/photo-1518110925495-5fe2fda0442c?w=600&h=600&fit=crop'
+};
+
+function getProductImage(product) {
+    if (!product || !product.image) {
+        return DEFAULT_PRODUCT_IMAGE;
+    }
+
+    // Evita imágenes corruptas o demasiado cortas
+    if (
+        typeof product.image !== 'string' ||
+        product.image.length < 50
+    ) {
+        return DEFAULT_PRODUCT_IMAGE;
+    }
+
+    return product.image;
+}
+
+function handleImageError(imgElement) {
+    imgElement.onerror = null;
+    // Try to find a data-category attribute for category-specific fallback
+    const cat = imgElement.dataset.category;
+    if (cat && CATEGORY_IMAGES[cat]) {
+        imgElement.src = CATEGORY_IMAGES[cat];
+    } else {
+        imgElement.src = DEFAULT_PRODUCT_IMAGE;
+    }
+}
+
+function isImageUrl(str) {
+    if (!str || typeof str !== 'string') return false;
+    const s = str.trim().toLowerCase();
+    return s.startsWith('http://') || s.startsWith('https://') || s.startsWith('data:') || s.startsWith('//');
+}
+
+function compressImage(file, callback) {
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+        const img = new Image();
+
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+
+            const MAX_WIDTH = 900;
+            const scale = MAX_WIDTH / img.width;
+
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scale;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            const compressed = canvas.toDataURL('image/jpeg', 0.72);
+            callback(compressed);
+        };
+
+        img.src = event.target.result;
+    };
+
+    reader.readAsDataURL(file);
+}
+// ==================== DATA STORE ====================
+const Store = {
+    data: {
+        products: [],
+        cart: [],
+        orders: [],
+        customers: [],
+        purchases: [],
+        expenses: [],
+        promos: [],
+        currentUser: null,
+        adminPassword: 'PrismaCore2026',
+        settings: { freeShippingMin: 20, pointRate: 0.1, pointValue: 0.1 }
+    },
+
+    init() {
+        const saved = localStorage.getItem('ferreagro_data');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            this.data = { ...this.data, ...parsed };
+        }
+        
+        // MIGRATION SCRIPT FOR OLD DATA:
+        // Set pointRate safely to 0.1 to avoid losing money
+        if (this.data.settings.pointRate === 1) {
+            this.data.settings.pointRate = 0.1; 
+        }
+        
+        // Ensure all existing customers have a status
+        if (this.data.customers) {
+            this.data.customers.forEach(c => {
+                if (!c.status) c.status = 'active';
+            });
+        }
+
+        // Ensure gato detal product exists (migration for existing users)
+        if (this.data.products && !this.data.products.find(p => p.id === 13)) {
+            this.data.products.push({ id: 13, name: 'Gato Económico (kg)', category: 'gato', type: 'detal', presentation: 'kg', weight: 1, stock: 100, cost: 1.5, price: 2.0, image: CATEGORY_IMAGES.gato, promo: false, active: true });
+        }
+
+        // Migration: ensure all existing products have active field
+        if (this.data.products) {
+            this.data.products.forEach(p => {
+                if (typeof p.active === 'undefined') p.active = true;
+            });
+        }
+
+        // Default products if none exist
+        if (!this.data.products || this.data.products.length === 0) {
+            this.data.products = [
+                { id: 1, name: 'Pollito Iniciador', category: 'aves', type: 'mayor', presentation: 'saco', weight: 40, stock: 15, cost: 28, price: 35, image: CATEGORY_IMAGES.aves, promo: false, active: true },
+                { id: 2, name: 'Pollo Engorde', category: 'aves', type: 'mayor', presentation: 'saco', weight: 40, stock: 20, cost: 26, price: 32, image: CATEGORY_IMAGES.aves, promo: true, promoPrice: 30, active: true },
+                { id: 3, name: 'Gallina Ponedora', category: 'aves', type: 'mayor', presentation: 'saco', weight: 40, stock: 12, cost: 24, price: 30, image: CATEGORY_IMAGES.aves, promo: false, active: true },
+                { id: 4, name: 'Cerdo Crecimiento', category: 'cerdo', type: 'mayor', presentation: 'saco', weight: 40, stock: 8, cost: 30, price: 38, image: CATEGORY_IMAGES.cerdo, promo: false, active: true },
+                { id: 5, name: 'Perro (Económico)', category: 'perro', type: 'mayor', presentation: 'saco', weight: 20, stock: 25, cost: 22, price: 28, image: CATEGORY_IMAGES.perro, promo: true, promoPrice: 25, active: true },
+                { id: 6, name: 'Gato (Económico)', category: 'gato', type: 'mayor', presentation: 'saco', weight: 15, stock: 18, cost: 25, price: 32, image: CATEGORY_IMAGES.gato, promo: false, active: true },
+                { id: 7, name: 'Maíz Partido', category: 'grano', type: 'mayor', presentation: 'saco', weight: 45, stock: 30, cost: 20, price: 25, image: CATEGORY_IMAGES.grano, promo: false, active: true },
+                { id: 8, name: 'Sal Roja / Mineral', category: 'suplemento', type: 'mayor', presentation: 'saco', weight: 20, stock: 10, cost: 15, price: 20, image: CATEGORY_IMAGES.suplemento, promo: false, active: true },
+                { id: 9, name: 'Concentrado Cerdo', category: 'cerdo', type: 'detal', presentation: 'paquete', weight: 1, stock: 50, cost: 5, price: 7, image: CATEGORY_IMAGES.cerdo, promo: false, active: true },
+                { id: 10, name: 'Pollito Iniciador (kg)', category: 'aves', type: 'detal', presentation: 'kg', weight: 1, stock: 200, cost: 0.8, price: 1.1, image: CATEGORY_IMAGES.aves, promo: false, active: true },
+                { id: 11, name: 'Pollo Engorde (kg)', category: 'aves', type: 'detal', presentation: 'kg', weight: 1, stock: 200, cost: 0.75, price: 1, image: CATEGORY_IMAGES.aves, promo: false, active: true },
+                { id: 12, name: 'Perro Económico (kg)', category: 'perro', type: 'detal', presentation: 'kg', weight: 1, stock: 150, cost: 1.2, price: 1.5, image: CATEGORY_IMAGES.perro, promo: false, active: true },
+                { id: 13, name: 'Gato Económico (kg)', category: 'gato', type: 'detal', presentation: 'kg', weight: 1, stock: 100, cost: 1.5, price: 2.0, image: CATEGORY_IMAGES.gato, promo: false, active: true },
+            ];
+        }
+        this.save();
+    },
+
+    save() { localStorage.setItem('ferreagro_data', JSON.stringify(this.data)); },
+    getProducts() { return this.data.products; },
+    getProduct(id) { return this.data.products.find(p => p.id === id); },
+    updateProduct(id, updates) {
+        const idx = this.data.products.findIndex(p => p.id === id);
+        if (idx >= 0) { this.data.products[idx] = { ...this.data.products[idx], ...updates }; this.save(); }
+    },
+    addProduct(product) {
+        product.id = Date.now();
+        product.active = product.active !== false;
+        this.data.products.push(product);
+        this.save();
+    },
+    deleteProduct(id) {
+        this.data.products = this.data.products.filter(p => p.id !== id);
+        this.save();
+    },
+    addOrder(order) {
+        order.id = Date.now();
+        order.date = new Date().toISOString();
+        order.number = '#' + String(this.data.orders.length + 1).padStart(4, '0');
+        this.data.orders.unshift(order);
+        
+        // Deduct stock
+        order.items.forEach(item => {
+            const p = this.getProduct(item.productId);
+            if (p) p.stock = Math.max(0, p.stock - item.qty);
+        });
+        
+        // Add points if affiliated AND active (NOT frozen)
+        if (order.customerId) {
+            const cust = this.data.customers.find(c => c.id === order.customerId);
+            if (cust) {
+                if (cust.status !== 'frozen') {
+                    const points = Math.floor(order.total * this.data.settings.pointRate);
+                    cust.points = (cust.points || 0) + points;
+                    cust.totalSpent = (cust.totalSpent || 0) + order.total;
+                }
+            }
+        }
+        this.save();
+        return order;
+    },
+    deleteOrder(orderId) {
+        const orderIndex = this.data.orders.findIndex(o => o.id === orderId);
+        if (orderIndex === -1) return;
+        const order = this.data.orders[orderIndex];
+
+        // 1. Devolver el inventario
+        order.items.forEach(item => {
+            const p = this.getProduct(item.productId);
+            if (p) p.stock += item.qty;
+        });
+
+        // 2. Reversar los puntos si el cliente está afiliado (incluso si luego fue congelado)
+        if (order.customerId) {
+            const cust = this.data.customers.find(c => c.id === order.customerId);
+            if (cust) {
+                const pointsToDeduct = Math.floor(order.total * this.data.settings.pointRate);
+                cust.points = Math.max(0, (cust.points || 0) - pointsToDeduct);
+                cust.totalSpent = Math.max(0, (cust.totalSpent || 0) - order.total);
+            }
+        }
+
+        // 3. Eliminar la orden del registro
+        this.data.orders.splice(orderIndex, 1);
+        this.save();
+    },
+    updateOrderStatus(orderId, newStatus) {
+        const order = this.data.orders.find(o => o.id === orderId);
+        if (order) {
+            order.status = newStatus;
+            this.save();
+            return true;
+        }
+        return false;
+    },
+    addCustomer(customer) {
+        const exists = this.data.customers.find(c => c.phone === customer.phone);
+        if (exists) return exists;
+        customer.id = Date.now();
+        customer.points = 0;
+        customer.totalSpent = 0;
+        customer.status = 'active'; // Default status
+        customer.joinDate = new Date().toISOString();
+        this.data.customers.push(customer);
+        this.save();
+        return customer;
+    },
+    getCustomerByPhone(phone) { return this.data.customers.find(c => c.phone === phone); },
+    updateCustomerStatus(id, newStatus) {
+        const cust = this.data.customers.find(c => c.id === id);
+        if (cust) {
+            cust.status = newStatus;
+            this.save();
+            return true;
+        }
+        return false;
+    },
+    deleteCustomer(id) {
+        this.data.customers = this.data.customers.filter(c => c.id !== id);
+        this.save();
+    },
+    addPurchase(purchase) {
+        purchase.id = Date.now();
+        purchase.date = new Date().toISOString();
+        this.data.purchases.push(purchase);
+        // Add stock
+        purchase.items.forEach(item => {
+            const p = this.getProduct(item.productId);
+            if (p) p.stock += item.qty;
+        });
+        this.save();
+    },
+    addExpense(expense) {
+        expense.id = Date.now();
+        expense.date = new Date().toISOString();
+        this.data.expenses.push(expense);
+        this.save();
+    },
+    redeemPoints(customerId, points) {
+        const cust = this.data.customers.find(c => c.id === customerId);
+        if (cust && cust.status !== 'frozen' && cust.points >= points) {
+            cust.points -= points;
+            this.save();
+            return true;
+        }
+        return false;
+    }
+};
+
+// ==================== ROUTER ====================
+const router = {
+    currentRoute: 'home',
+    navigate(route) {
+        this.currentRoute = route;
+        window.scrollTo(0, 0);
+        render();
+    }
+};
+
+// ==================== RENDER FUNCTIONS ====================
+function render() {
+    const main = document.getElementById('main-content');
+    const route = router.currentRoute;
+
+    if (route === 'home') main.innerHTML = renderHome();
+    else if (route === 'catalog') main.innerHTML = renderCatalog();
+    else if (route === 'affiliate') main.innerHTML = renderAffiliate();
+    else if (route === 'admin') main.innerHTML = renderAdmin();
+
+    // Re-attach event listeners after render
+    if (route === 'catalog') attachCatalogEvents();
+    if (route === 'admin') attachAdminEvents();
+}
+
+function renderHome() {
+    const promos = Store.data.products.filter(p => p.promo && p.active !== false);
+    return `
+    <div class="fade-in">
+        <section class="relative bg-gradient-to-br from-brand-green via-brand-dark to-brand-green overflow-hidden">
+            <div class="absolute inset-0 opacity-10">
+                <svg width="100%" height="100%"><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/></pattern><rect width="100%" height="100%" fill="url(#grid)"/></svg>
+            </div>
+            <div class="max-w-7xl mx-auto px-4 py-16 md:py-24 relative">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full text-white text-sm font-medium mb-6">
+                            <span class="w-2 h-2 bg-brand-orange rounded-full animate-pulse"></span>
+                            Despacho Gratis en García
+                        </div>
+                        <h1 class="text-4xl md:text-6xl font-bold text-white leading-tight mb-6">
+                            Alimentos de <span class="text-brand-orange">Calidad</span> para tus Animales
+                        </h1>
+                        <p class="text-green-100 text-lg mb-8 max-w-lg">
+                            Venta al mayor por sacos y al detal por kilos. Pollos, cerdos, perros y gatos. 
+                            ¡Afíliate y acumula puntos por cada compra!
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <button onclick="router.navigate('catalog')" class="bg-brand-orange hover:bg-brand-lightorange text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-orange-500/30">
+                                Ver Catálogo <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                            <button onclick="showAffiliateModal()" class="bg-white/10 hover:bg-white/20 backdrop-blur text-white px-8 py-4 rounded-xl font-bold text-lg transition border border-white/30">
+                                <i class="fas fa-gift mr-2"></i>Programa de Puntos
+                            </button>
+                            <a href="https://wa.me/584123521113?text=Hola%20Ferreagro%20El%20Conuco%2C%20quiero%20hacer%20un%20pedido" 
+                               target="_blank"
+                               class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-green-500/30 flex items-center">
+                                <i class="fab fa-whatsapp mr-2 text-xl"></i>Pedir por WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                    <div class="hidden md:flex justify-center">
+                        <div class="relative">
+                            <div class="w-80 h-80 bg-brand-orange/20 rounded-full absolute -top-8 -left-8 animate-pulse"></div>
+                            <div class="w-80 h-80 bg-white/10 rounded-full absolute top-8 left-8"></div>
+                            <div class="relative bg-white/10 backdrop-blur rounded-3xl p-8 border border-white/20 text-center">
+                                <!-- Big Logo -->
+                                <div class="flex justify-center mb-6">
+                                    <svg class="w-40 h-40 drop-shadow-lg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="50" cy="50" r="48" fill="#2D7D32"/>
+                                        <circle cx="50" cy="50" r="44" fill="none" stroke="#FFF8E1" stroke-width="1" opacity="0.25"/>
+                                        <path d="M6 52 Q25 42 50 52 Q75 62 94 52" fill="none" stroke="#1B5E20" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+                                        <path d="M10 60 Q28 50 50 60 Q72 70 90 60" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+                                        <path d="M14 68 Q30 58 50 68 Q70 78 86 68" fill="none" stroke="#1B5E20" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+                                        <path d="M50 72 L50 38" fill="none" stroke="#4CAF50" stroke-width="3" stroke-linecap="round"/>
+                                        <path d="M50 55 Q35 48 32 40 Q40 46 50 52" fill="#66BB6A"/>
+                                        <path d="M50 48 Q65 41 68 33 Q60 39 50 45" fill="#66BB6A"/>
+                                        <path d="M50 42 Q42 34 44 26 Q48 34 50 38" fill="#81C784"/>
+                                        <ellipse cx="50" cy="30" rx="4.5" ry="9" fill="#F57C00"/>
+                                        <ellipse cx="50" cy="30" rx="2.5" ry="6" fill="#FF9800"/>
+                                        
+                                        
+                                        
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-white mb-1">FERREAGRO</h3>
+                                <p class="text-brand-orange font-bold tracking-wider mb-4">EL CONUCO</p>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="bg-white/20 rounded-xl p-4 text-center">
+                                        <div class="text-2xl font-bold text-white">+</div>
+                                        <div class="text-xs text-green-100">Productos</div>
+                                    </div>
+                                    <div class="bg-white/20 rounded-xl p-4 text-center">
+                                        <div class="text-2xl font-bold text-white">+</div>
+                                        <div class="text-xs text-green-100">Calidad</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="max-w-7xl mx-auto px-4 py-16">
+            <h2 class="text-3xl font-bold text-center mb-12 text-brand-dark">Nuestras Categorías</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                ${[
+                    {name: 'Aves', icon: CATEGORY_IMAGES.aves, color: 'bg-amber-100 text-amber-700', cat: 'aves'},
+                    {name: 'Cerdos', icon: CATEGORY_IMAGES.cerdo, color: 'bg-pink-100 text-pink-700', cat: 'cerdo'},
+                    {name: 'Perros', icon: CATEGORY_IMAGES.perro, color: 'bg-blue-100 text-blue-700', cat: 'perro'},
+                    {name: 'Gatos', icon: CATEGORY_IMAGES.gato, color: 'bg-purple-100 text-purple-700', cat: 'gato'}
+                ].map(c => `
+                    <button onclick="filterByCategory('${c.cat}')" class="card-hover bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-100 hover:border-brand-green/30">
+                        <div class="w-16 h-16 rounded-full overflow-hidden mx-auto mb-3 shadow-sm"><img src="${c.icon}" class="w-full h-full object-cover" onerror="this.src=DEFAULT_PRODUCT_IMAGE"></div>
+                        <h3 class="font-bold text-gray-800">${c.name}</h3>
+                        <p class="text-xs text-gray-500 mt-1">Ver productos</p>
+                    </button>
+                `).join('')}
+            </div>
+        </section>
+
+        ${promos.length > 0 ? `
+        <section class="bg-brand-cream py-16">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-3xl font-bold text-brand-dark">🔥 Ofertas Especiales</h2>
+                    <button onclick="router.navigate('catalog')" class="text-brand-green font-semibold hover:underline">Ver todo →</button>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6">
+                    ${promos.map(p => renderProductCard(p)).join('')}
+                </div>
+            </div>
+        </section>
+        ` : ''}
+
+        <section class="max-w-7xl mx-auto px-4 py-16">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center p-6">
+                    <div class="w-16 h-16 bg-brand-green/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-truck text-2xl text-brand-green"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Despacho Gratis</h3>
+                    <p class="text-gray-500 text-sm">En el municipio García en compras mayores a $20. Condiciones aplican.</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="w-16 h-16 bg-brand-orange/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-mobile-alt text-2xl text-brand-orange"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Pago Móvil</h3>
+                    <p class="text-gray-500 text-sm">Paga de forma rápida y segura mediante pago móvil. Confirmación inmediata.</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="w-16 h-16 bg-brand-dark/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-award text-2xl text-brand-dark"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Puntos por Compra</h3>
+                    <p class="text-gray-500 text-sm">Afíliate gratis y acumula puntos canjeables por descuentos exclusivos.</p>
+                </div>
+            </div>
+        </section>
+    </div>`;
+}
+
+function renderProductCard(p) {
+    const isPromo = p.promo && p.promoPrice;
+    return `
+    <div class="card-hover bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+        <div class="relative bg-gradient-to-br from-gray-50 to-gray-100 p-6 text-center">
+            <div class="h-40 flex items-center justify-center overflow-hidden rounded-t-2xl">
+                            ${isImageUrl(p.image) ? `<img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover" onerror="handleImageError(this)" data-category="${p.category}">` : `<div class="text-6xl">${p.image || '📦'}</div>`}
+                        </div>
+            ${isPromo ? `<div class="absolute top-3 left-3 bg-brand-orange text-white text-xs font-bold px-3 py-1 rounded-full">OFERTA</div>` : ''}
+            <div class="absolute top-3 right-3 bg-white/90 backdrop-blur text-xs font-semibold px-2 py-1 rounded-lg">${p.presentation === 'unidad' ? 'Unidad' : p.presentation}</div>
+        </div>
+        <div class="p-4 flex-1 flex flex-col">
+            <div class="flex items-start justify-between mb-2">
+                <h3 class="font-bold text-gray-800">${p.name}</h3>
+            </div>
+            <p class="text-xs text-gray-500 mb-3">${p.weight}kg • ${p.type === 'mayor' ? 'Venta al Mayor' : 'Venta al Detal'}</p>
+            <div class="mt-auto">
+                <div class="flex items-end gap-2 mb-3">
+                    ${isPromo ? `
+                        <span class="text-2xl font-bold text-brand-green">$${p.promoPrice.toFixed(2)}</span>
+                        <span class="text-sm text-gray-400 line-through">$${p.price.toFixed(2)}</span>
+                    ` : `
+                        <span class="text-2xl font-bold text-brand-green">$${p.price.toFixed(2)}</span>
+                    `}
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="addToCart(${p.id})" class="flex-1 bg-brand-green hover:bg-brand-dark text-white py-2 rounded-lg font-semibold text-sm transition">
+                        <i class="fas fa-cart-plus mr-1"></i> Agregar
+                    </button>
+                    <button onclick="consultWhatsApp(${p.id})" class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition" title="Consultar por WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </button>
+                    <button onclick="quickView(${p.id})" class="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                        <i class="fas fa-eye text-gray-500"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>`;
+}
+
+function renderCatalog() {
+    return `
+    <div class="fade-in max-w-7xl mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row gap-8">
+            <aside class="w-full md:w-64 flex-shrink-0">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
+                    <h3 class="font-bold text-lg mb-4">Filtros</h3>
+
+                    <div class="mb-6">
+                        <label class="text-sm font-medium text-gray-700 mb-2 block">Buscar</label>
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="catalog-search" oninput="filterCatalog()" class="w-full border rounded-lg pl-10 pr-4 py-2 text-sm" placeholder="Nombre del producto...">
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="text-sm font-medium text-gray-700 mb-2 block">Categoría</label>
+                        <div class="space-y-2">
+                            ${[['all','Todos'],['aves','Aves'],['cerdo','Cerdos'],['perro','Perros'],['gato','Gatos'],['grano','Granos'],['suplemento','Suplementos']].map(([val,label]) => `
+                                <label class="flex items-center gap-2 cursor-pointer hover:text-brand-green transition">
+                                    <input type="radio" name="cat-filter" value="${val}" ${val==='all'?'checked':''} onchange="filterCatalog()" class="text-brand-green focus:ring-brand-green">
+                                    <span class="text-sm">${label}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="text-sm font-medium text-gray-700 mb-2 block">Tipo de Venta</label>
+                        <div class="space-y-2">
+                            ${[['all','Todos'],['mayor','Al Mayor (Sacos)'],['detal','Al Detal (kg/u)'],['unidad','Por Unidad']].map(([val,label]) => `
+                                <label class="flex items-center gap-2 cursor-pointer hover:text-brand-green transition">
+                                    <input type="radio" name="type-filter" value="${val}" ${val==='all'?'checked':''} onchange="filterCatalog()" class="text-brand-green focus:ring-brand-green">
+                                    <span class="text-sm">${label}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="promo-only" onchange="filterCatalog()" class="text-brand-orange rounded focus:ring-brand-orange">
+                            <span class="text-sm font-medium text-brand-orange">Solo Ofertas</span>
+                        </label>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="flex-1">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-brand-dark">Catálogo de Productos</h2>
+                    <span id="results-count" class="text-sm text-gray-500">${Store.data.products.filter(p => p.active !== false).length} productos activos</span>
+                </div>
+                <div id="catalog-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${Store.data.products.filter(p => p.active !== false).map(p => renderProductCard(p)).join('')}
+                </div>
+            </div>
+        </div>
+    </div>`;
+}
+
+function renderAffiliate() {
+    return `
+    <div class="fade-in max-w-4xl mx-auto px-4 py-12">
+        <div class="text-center mb-12">
+            <div class="w-20 h-20 bg-brand-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-crown text-4xl text-brand-green"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-brand-dark mb-4">Programa de Afiliados</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">Únete gratis a nuestro programa de fidelización. Acumula puntos con cada compra y canjéalos por descuentos acumulables en tus próximas órdenes.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 mb-12">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                <h2 class="text-2xl font-bold mb-6 text-brand-green">¿Cómo funciona?</h2>
+                <div class="space-y-6">
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 bg-brand-green text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+                        <div>
+                            <h4 class="font-bold">Regístrate gratis</h4>
+                            <p class="text-sm text-gray-500">Completa el formulario con tus datos. Sin costos ni compromisos.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 bg-brand-green text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                        <div>
+                            <h4 class="font-bold">Compra y acumula</h4>
+                            <p class="text-sm text-gray-500">Gana puntos por cada compra. Los puntos no expiran (si tu cuenta está activa).</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 bg-brand-orange text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+                        <div>
+                            <h4 class="font-bold">Canjea tus puntos</h4>
+                            <p class="text-sm text-gray-500">Usa tus puntos como descuento en cualquier compra. ¡Acumulables!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-brand-green to-brand-dark rounded-2xl p-8 text-white">
+                <h2 class="text-2xl font-bold mb-6">Tabla de Recompensas</h2>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-white/10 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-coins text-brand-orange"></i>
+                            <span class="font-semibold">50 puntos</span>
+                        </div>
+                        <span class="font-bold text-brand-orange">$5 OFF</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-white/10 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-coins text-brand-orange"></i>
+                            <span class="font-semibold">100 puntos</span>
+                        </div>
+                        <span class="font-bold text-brand-orange">$12 OFF</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-white/10 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-crown text-brand-orange"></i>
+                            <span class="font-semibold">200 puntos</span>
+                        </div>
+                        <span class="font-bold text-brand-orange">$30 OFF</span>
+                    </div>
+                </div>
+                <p class="text-xs text-green-200 mt-4">* Los descuentos son acumulables con otras promociones.</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+            <h2 class="text-2xl font-bold mb-6 text-center text-brand-dark">Regístrate Ahora</h2>
+            <form id="affiliate-form" onsubmit="registerAffiliate(event)" class="max-w-lg mx-auto space-y-4">
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Nombre</label>
+                        <input type="text" id="aff-name" required class="w-full border rounded-lg px-4 py-2" placeholder="Tu nombre">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Apellido</label>
+                        <input type="text" id="aff-lastname" required class="w-full border rounded-lg px-4 py-2" placeholder="Tu apellido">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Teléfono</label>
+                    <input type="tel" id="aff-phone" required class="w-full border rounded-lg px-4 py-2" placeholder="0412-XXXXXXX">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Correo Electrónico (opcional)</label>
+                    <input type="email" id="aff-email" class="w-full border rounded-lg px-4 py-2" placeholder="email@ejemplo.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Dirección</label>
+                    <textarea id="aff-address" required rows="2" class="w-full border rounded-lg px-4 py-2" placeholder="Tu dirección de entrega"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-brand-orange hover:bg-brand-lightorange text-white font-bold py-3 rounded-xl transition">
+                    <i class="fas fa-user-plus mr-2"></i>Crear Cuenta de Afiliado
+                </button>
+            </form>
+
+            <div class="mt-8 pt-8 border-t">
+                <h3 class="font-bold text-lg mb-4 text-center">¿Ya eres afiliado? Consulta tus puntos</h3>
+                <div class="flex gap-2 max-w-md mx-auto">
+                    <input type="tel" id="check-phone" class="flex-1 border rounded-lg px-4 py-2" placeholder="Ingresa tu teléfono">
+                    <button onclick="checkPoints()" class="bg-brand-green hover:bg-brand-dark text-white px-6 py-2 rounded-lg font-semibold transition">
+                        Consultar
+                    </button>
+                </div>
+                <div id="points-result" class="mt-4 hidden max-w-md mx-auto"></div>
+            </div>
+        </div>
+    </div>`;
+}
+
+function renderAdmin() {
+    return `
+    <div class="fade-in min-h-screen bg-gray-100">
+        <div id="admin-login" class="flex items-center justify-center min-h-screen">
+            <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md mx-4">
+                <div class="text-center mb-8">
+                    <svg class="w-16 h-16 mx-auto mb-4" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#2D7D32"/><circle cx="50" cy="50" r="44" fill="none" stroke="#FFF8E1" stroke-width="1" opacity="0.25"/><path d="M6 52 Q25 42 50 52 Q75 62 94 52" fill="none" stroke="#1B5E20" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/><path d="M10 60 Q28 50 50 60 Q72 70 90 60" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" opacity="0.5"/><path d="M50 72 L50 38" fill="none" stroke="#4CAF50" stroke-width="3" stroke-linecap="round"/><path d="M50 55 Q35 48 32 40 Q40 46 50 52" fill="#66BB6A"/><path d="M50 48 Q65 41 68 33 Q60 39 50 45" fill="#66BB6A"/><path d="M50 42 Q42 34 44 26 Q48 34 50 38" fill="#81C784"/><ellipse cx="50" cy="30" rx="4.5" ry="9" fill="#F57C00"/><ellipse cx="50" cy="30" rx="2.5" ry="6" fill="#FF9800"/></svg>
+                    <h2 class="text-2xl font-bold text-brand-dark">Panel de Administración</h2>
+                    <p class="text-gray-500 text-sm mt-1">Ferreagro El Conuco</p>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Contraseña</label>
+                        <input type="password" id="admin-pass" class="w-full border rounded-lg px-4 py-3" placeholder="••••••••">
+                    </div>
+                    <button onclick="loginAdmin()" class="w-full bg-brand-green hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition">
+                        <i class="fas fa-lock mr-2"></i>Ingresar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-dashboard" class="hidden">
+            <div class="flex min-h-screen">
+                <aside class="w-64 bg-brand-dark text-white flex-shrink-0 hidden md:flex flex-col">
+                    <div class="p-6 border-b border-green-700">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-8 h-8" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#2D7D32"/><circle cx="50" cy="50" r="44" fill="none" stroke="#FFF8E1" stroke-width="1" opacity="0.25"/><path d="M6 52 Q25 42 50 52 Q75 62 94 52" fill="none" stroke="#1B5E20" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/><path d="M10 60 Q28 50 50 60 Q72 70 90 60" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" opacity="0.5"/><path d="M50 72 L50 38" fill="none" stroke="#4CAF50" stroke-width="3" stroke-linecap="round"/><path d="M50 55 Q35 48 32 40 Q40 46 50 52" fill="#66BB6A"/><path d="M50 48 Q65 41 68 33 Q60 39 50 45" fill="#66BB6A"/><path d="M50 42 Q42 34 44 26 Q48 34 50 38" fill="#81C784"/><ellipse cx="50" cy="30" rx="4.5" ry="9" fill="#F57C00"/><ellipse cx="50" cy="30" rx="2.5" ry="6" fill="#FF9800"/></svg>
+                            <span class="font-bold">Admin</span>
+                        </div>
+                    </div>
+                    <nav class="flex-1 p-4 space-y-1">
+                        ${[
+                            {id:'dash',icon:'fa-chart-line',label:'Dashboard'},
+                            {id:'inventory',icon:'fa-boxes',label:'Inventario'},
+                            {id:'sales',icon:'fa-shopping-bag',label:'Libro de Ventas'},
+                            {id:'purchases',icon:'fa-truck-loading',label:'Libro de Compras'},
+                            {id:'customers',icon:'fa-users',label:'Clientes'},
+                            {id:'promos',icon:'fa-percent',label:'Promociones'},
+                            {id:'balance',icon:'fa-balance-scale',label:'Balance G/P'},
+                            {id:'settings',icon:'fa-cog',label:'Configuración'}
+                        ].map(item => `
+                            <button onclick="switchAdminTab('${item.id}')" id="tab-${item.id}" class="admin-tab w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3 ${item.id==='dash'?'bg-white/20':''}">
+                                <i class="fas ${item.icon} w-5"></i>${item.label}
+                            </button>
+                        `).join('')}
+                    </nav>
+                    <div class="p-4 border-t border-green-700">
+                        <button onclick="logoutAdmin()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3 text-green-200">
+                            <i class="fas fa-sign-out-alt w-5"></i>Cerrar Sesión
+                        </button>
+                    </div>
+                </aside>
+
+                <div class="md:hidden fixed bottom-0 left-0 right-0 bg-brand-dark text-white z-40 flex overflow-x-auto">
+                    ${['dash','inventory','sales','customers','balance'].map(id => `
+                        <button onclick="switchAdminTab('${id}')" class="flex-1 px-3 py-3 text-center text-xs whitespace-nowrap">
+                            <i class="fas fa-${id==='dash'?'chart-line':id==='inventory'?'boxes':id==='sales'?'shopping-bag':id==='customers'?'users':'balance-scale'} block mb-1 text-lg"></i>
+                            ${id==='dash'?'Dash':id==='inventory'?'Inv.':id==='sales'?'Ventas':id==='customers'?'Clientes':'Balance'}
+                        </button>
+                    `).join('')}
+                </div>
+
+                <main class="flex-1 p-4 md:p-8 pb-20 md:pb-8 overflow-auto">
+                    <div id="admin-content">
+                        </div>
+                </main>
+            </div>
+        </div>
+    </div>`;
+}
+
+// ==================== ADMIN DASHBOARD TABS ====================
+const adminTabs = {
+    dash() {
+        const orders = Store.data.orders;
+        const totalSales = orders.reduce((s,o) => s + o.total, 0);
+        const totalCost = orders.reduce((s,o) => s + (o.costTotal || o.total * 0.7), 0);
+        const profit = totalSales - totalCost;
+        const customers = Store.data.customers.length;
+        const products = Store.data.products.filter(p => p.active !== false).length;
+
+        return `
+        <h2 class="text-2xl font-bold mb-6 text-brand-dark">Dashboard</h2>
+        <div class="grid md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-brand-green/10 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-dollar-sign text-brand-green text-xl"></i>
+                    </div>
+                    <span class="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-full">+12%</span>
+                </div>
+                <p class="text-gray-500 text-sm">Ventas Totales</p>
+                <p class="text-2xl font-bold text-brand-dark">$${totalSales.toFixed(2)}</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-brand-orange/10 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-chart-line text-brand-orange text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-sm">Ganancia Neta</p>
+                <p class="text-2xl font-bold text-brand-dark">$${profit.toFixed(2)}</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-users text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-sm">Clientes Afiliados</p>
+                <p class="text-2xl font-bold text-brand-dark">${customers}</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-box text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-sm">Productos Activos</p>
+                <p class="text-2xl font-bold text-brand-dark">${products}</p>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h3 class="font-bold text-lg mb-4">Últimas Ventas</h3>
+                <div class="space-y-3">
+                    ${orders.slice(0,5).map(o => `
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-semibold text-sm">${o.number}</p>
+                                <p class="text-xs text-gray-500">${o.customerName || 'Cliente general'}</p>
+                            </div>
+                            <span class="font-bold text-brand-green">$${o.total.toFixed(2)}</span>
+                        </div>
+                    `).join('') || '<p class="text-gray-400 text-sm">No hay ventas registradas</p>'}
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h3 class="font-bold text-lg mb-4">Stock Bajo</h3>
+                <div class="space-y-3">
+                    ${Store.data.products.filter(p => p.stock < 10).map(p => `
+                        <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                ${isImageUrl(p.image) ? `<img src="${p.image}" class="w-10 h-10 rounded-lg object-cover" onerror="handleImageError(this)" data-category="${p.category}">` : `<span class="text-2xl">${p.image || '📦'}</span>`}
+                                <div>
+                                    <p class="font-semibold text-sm">${p.name}</p>
+                                    <p class="text-xs text-gray-500">${p.presentation === 'unidad' ? 'Unidad' : p.presentation + ' • ' + p.weight + 'kg'}</p>
+                                </div>
+                            </div>
+                            <span class="text-red-600 font-bold text-sm">${p.stock} left</span>
+                        </div>
+                    `).join('') || '<p class="text-gray-400 text-sm">Todo el inventario está bien</p>'}
+                </div>
+            </div>
+        </div>`;
+    },
+
+    inventory() {
+        return `
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+            <h2 class="text-2xl font-bold text-brand-dark">Gestión de Inventario</h2>
+            <div class="flex items-center gap-3">
+                <select id="inv-status-filter" onchange="filterInventory()" class="border rounded-lg px-3 py-2 text-sm">
+                    <option value="all">Todos</option>
+                    <option value="active" selected>Activos</option>
+                    <option value="inactive">Inactivos</option>
+                </select>
+                <button onclick="openProductModal()" class="bg-brand-green hover:bg-brand-dark text-white px-4 py-2 rounded-lg font-semibold transition">
+                    <i class="fas fa-plus mr-2"></i>Nuevo Producto
+                </button>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b">
+                        <tr>
+                            <th class="text-left px-6 py-4 font-semibold">Producto</th>
+                            <th class="text-left px-6 py-4 font-semibold">Categoría</th>
+                            <th class="text-left px-6 py-4 font-semibold">Tipo</th>
+                            <th class="text-right px-6 py-4 font-semibold">Stock</th>
+                            <th class="text-right px-6 py-4 font-semibold">Costo</th>
+                            <th class="text-right px-6 py-4 font-semibold">Precio</th>
+                            <th class="text-center px-6 py-4 font-semibold">Estado</th>
+                            <th class="text-center px-6 py-4 font-semibold">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        ${Store.data.products.map(p => `
+                            <tr class="hover:bg-gray-50 transition ${p.active === false ? 'bg-gray-100 opacity-60' : ''}" data-status="${p.active !== false ? 'active' : 'inactive'}">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-2xl">${p.image}</span>
+                                        <div>
+                                            <p class="font-semibold">${p.name}</p>
+                                            <p class="text-xs text-gray-500">${p.presentation === 'unidad' ? 'Por Unidad' : p.weight + 'kg ' + p.presentation}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 capitalize">${p.category}</td>
+                                <td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs font-medium ${p.type==='mayor'?'bg-brand-green/10 text-brand-green':'bg-brand-orange/10 text-brand-orange'}">${p.type==='mayor'?'Mayor':'Detal'}</span></td>
+                                <td class="px-6 py-4 text-right font-mono ${p.stock<10?'text-red-600 font-bold':''}">${p.stock}</td>
+                                <td class="px-6 py-4 text-right font-mono">$${p.cost.toFixed(2)}</td>
+                                <td class="px-6 py-4 text-right font-mono font-semibold">$${p.price.toFixed(2)}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <button onclick="toggleProductActive(${p.id})" class="px-2 py-1 rounded-full text-xs font-bold uppercase cursor-pointer hover:opacity-80 transition ${p.active !== false ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'}">
+                                        ${p.active !== false ? 'Activo' : 'Inactivo'}
+                                    </button>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <button onclick="toggleProductActive(${p.id})" class="${p.active !== false ? 'text-green-500 hover:text-green-700' : 'text-gray-400 hover:text-gray-600'} mr-2" title="${p.active !== false ? 'Desactivar' : 'Activar'}">
+                                        <i class="fas ${p.active !== false ? 'fa-toggle-on' : 'fa-toggle-off'} text-lg"></i>
+                                    </button>
+                                    <button onclick="editProduct(${p.id})" class="text-brand-green hover:text-brand-dark mr-2"><i class="fas fa-edit"></i></button>
+                                    <button onclick="deleteProduct(${p.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="product-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-lg w-full fade-in">
+                <div class="p-6">
+                    <h3 id="pm-title" class="text-xl font-bold mb-4">Nuevo Producto</h3>
+                    <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4">
+                        <input type="hidden" id="pm-id">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium mb-1">Nombre</label>
+                                <input type="text" id="pm-name" required class="w-full border rounded-lg px-4 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Categoría</label>
+                                <select id="pm-category" class="w-full border rounded-lg px-4 py-2">
+                                    <option value="aves">Aves</option><option value="cerdo">Cerdo</option>
+                                    <option value="perro">Perro</option><option value="gato">Gato</option>
+                                    <option value="grano">Grano</option><option value="suplemento">Suplemento</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Tipo</label>
+                                <select id="pm-type" class="w-full border rounded-lg px-4 py-2">
+                                    <option value="mayor">Al Mayor</option><option value="detal">Al Detal</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Presentación</label>
+                                <select id="pm-presentation" class="w-full border rounded-lg px-4 py-2">
+                                    <option value="saco">Saco</option><option value="paquete">Paquete</option><option value="kg">Kilogramo</option><option value="unidad">Unidad</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Peso (kg)</label>
+                                <input type="number" id="pm-weight" step="0.1" required class="w-full border rounded-lg px-4 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Stock</label>
+                                <input type="number" id="pm-stock" required class="w-full border rounded-lg px-4 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Costo ($)</label>
+                                <input type="number" id="pm-cost" step="0.01" required class="w-full border rounded-lg px-4 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Precio Venta ($)</label>
+                                <input type="number" id="pm-price" step="0.01" required class="w-full border rounded-lg px-4 py-2">
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="pm-promo" class="rounded text-brand-orange">
+                            <label class="text-sm">En promoción</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="pm-active" class="rounded text-brand-green" checked>
+                            <label class="text-sm font-medium">Producto activo (visible en catálogo)</label>
+                        </div>
+                        <div id="pm-promo-price-container" class="hidden">
+                            <label class="block text-sm font-medium mb-1">Precio Promoción ($)</label>
+                            <input type="number" id="pm-promo-price" step="0.01" class="w-full border rounded-lg px-4 py-2">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium mb-1">URL de Imagen</label>
+                            <input type="url" id="pm-image-url" class="w-full border rounded-lg px-4 py-2 text-sm" placeholder="https://... (dejar en blanco para imagen por categoría)" oninput="previewProductImage()">
+                            <p class="text-xs text-gray-400 mt-1">Pega aquí el link de Imgur, Unsplash, Cloudinary, etc.</p>
+                        </div>
+                        <div class="col-span-2 flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                            <div class="w-20 h-20 rounded-lg overflow-hidden bg-white border flex items-center justify-center">
+                                <img id="pm-image-preview" src="" class="w-full h-full object-cover hidden" onerror="this.classList.add('hidden');document.getElementById('pm-image-preview-fallback').classList.remove('hidden');" onload="this.classList.remove('hidden');document.getElementById('pm-image-preview-fallback').classList.add('hidden');">
+                                <div id="pm-image-preview-fallback" class="text-3xl">📦</div>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Vista previa</p>
+                                <p id="pm-image-status" class="text-xs text-gray-500">Ingresa una URL para previsualizar</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 pt-4">
+                            <button type="button" onclick="closeProductModal()" class="flex-1 border border-gray-300 py-2 rounded-lg hover:bg-gray-50">Cancelar</button>
+                            <button type="submit" class="flex-1 bg-brand-green hover:bg-brand-dark text-white py-2 rounded-lg font-semibold">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>`;
+    },
+
+    sales() {
+        const orders = Store.data.orders;
+        return `
+        <h2 class="text-2xl font-bold mb-6 text-brand-dark">Libro de Ventas</h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b">
+                        <tr>
+                            <th class="text-left px-4 py-4 font-semibold">Orden</th>
+                            <th class="text-left px-4 py-4 font-semibold">Fecha</th>
+                            <th class="text-left px-4 py-4 font-semibold">Cliente</th>
+                            <th class="text-left px-4 py-4 font-semibold">Productos Vendidos</th>
+                            <th class="text-right px-4 py-4 font-semibold">Total</th>
+                            <th class="text-center px-4 py-4 font-semibold">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        ${orders.map(o => `
+                            <tr class="hover:bg-gray-50 transition ${p.active === false ? 'bg-gray-100 opacity-60' : ''}" data-status="${p.active !== false ? 'active' : 'inactive'}">
+                                <td class="px-4 py-4 font-mono font-semibold text-brand-green">${o.number}</td>
+                                <td class="px-4 py-4 text-gray-500">${new Date(o.date).toLocaleDateString()}</td>
+                                <td class="px-4 py-4">
+                                    <p class="font-medium">${o.customerName || 'General'}</p>
+                                    <p class="text-xs text-gray-500">${o.customerPhone || ''}</p>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="space-y-1.5">
+                                        ${o.items.map(i => `
+                                            <div class="flex items-center justify-between gap-3 text-xs bg-gray-50 rounded px-2 py-1.5">
+                                                <div class="flex items-center gap-2 min-w-0">
+                                                    <span class="w-5 h-5 rounded bg-brand-green/10 text-brand-green flex items-center justify-center text-[10px] font-bold shrink-0">${i.qty}</span>
+                                                    <span class="font-medium truncate">${i.name}</span>
+                                                </div>
+                                                <div class="text-right shrink-0">
+                                                    <span class="text-gray-500">$${i.price.toFixed(2)} c/u</span>
+                                                    <span class="font-semibold ml-2">$${(i.price * i.qty).toFixed(2)}</span>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <p class="text-xs text-gray-400 mt-1.5">${o.items.length} producto(s) · ${o.items.reduce((s,i)=>s+i.qty,0)} unidad(es)</p>
+                                </td>
+                                <td class="px-4 py-4 text-right font-bold text-brand-dark">$${o.total.toFixed(2)}</td>
+                                <td class="px-4 py-4 text-center">
+                                    <div class="flex flex-col items-center gap-2">
+                                        <button onclick="cycleOrderStatus(${o.id})" class="px-2 py-1 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition ${o.status==='completed'?'bg-green-100 text-green-700':o.status==='pending'?'bg-yellow-100 text-yellow-700':'bg-blue-100 text-blue-700'}">
+                                            ${o.status==='completed'?'Completado':o.status==='pending'?'Pendiente':'Procesando'} <i class="fas fa-sync-alt ml-1 text-[10px]"></i>
+                                        </button>
+                                        <button onclick="openDispatchNote(${o.id})" class="text-brand-green hover:text-brand-dark text-xs font-semibold transition mr-2" title="Generar Nota de Despacho">
+                                            <i class="fas fa-file-invoice mr-1"></i>Despacho
+                                        </button>
+                                        <button onclick="deleteOrderFromAdmin(${o.id})" class="text-red-500 hover:text-red-700 text-xs" title="Anular Venta">
+                                            <i class="fas fa-trash mr-1"></i>Anular
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('') || '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400">No hay ventas registradas</td></tr>'}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+    },
+
+    purchases() {
+        return `
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-brand-dark">Libro de Compras</h2>
+            <button onclick="openPurchaseModal()" class="bg-brand-green hover:bg-brand-dark text-white px-4 py-2 rounded-lg font-semibold transition">
+                <i class="fas fa-plus mr-2"></i>Registrar Compra
+            </button>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b">
+                        <tr>
+                            <th class="text-left px-6 py-4 font-semibold">Fecha</th>
+                            <th class="text-left px-6 py-4 font-semibold">Proveedor</th>
+                            <th class="text-left px-6 py-4 font-semibold">Productos</th>
+                            <th class="text-right px-6 py-4 font-semibold">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        ${Store.data.purchases.map(p => `
+                            <tr class="hover:bg-gray-50 transition ${p.active === false ? 'bg-gray-100 opacity-60' : ''}" data-status="${p.active !== false ? 'active' : 'inactive'}">
+                                <td class="px-6 py-4 text-gray-500">${new Date(p.date).toLocaleDateString()}</td>
+                                <td class="px-6 py-4 font-medium">${p.supplier}</td>
+                                <td class="px-6 py-4">
+                                    <p class="text-xs">${p.items.length} item(s)</p>
+                                </td>
+                                <td class="px-6 py-4 text-right font-bold">$${p.total.toFixed(2)}</td>
+                            </tr>
+                        `).join('') || '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-400">No hay compras registradas</td></tr>'}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="purchase-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-lg w-full fade-in max-h-[90vh] overflow-y-auto">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold mb-4">Registrar Compra</h3>
+                    <form id="purchase-form" onsubmit="savePurchase(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Proveedor</label>
+                            <input type="text" id="pur-supplier" required class="w-full border rounded-lg px-4 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Producto</label>
+                            <select id="pur-product" class="w-full border rounded-lg px-4 py-2">
+                                ${Store.data.products.map(p => `<option value="${p.id}">${p.name} (Stock: ${p.stock})</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Cantidad</label>
+                                <input type="number" id="pur-qty" required min="1" class="w-full border rounded-lg px-4 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Costo Unitario ($)</label>
+                                <input type="number" id="pur-cost" step="0.01" required class="w-full border rounded-lg px-4 py-2">
+                            </div>
+                        </div>
+                        <div class="p-3 bg-gray-50 rounded-lg">
+                            <p class="text-sm font-semibold">Total: $<span id="pur-total-preview">0.00</span></p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button type="button" onclick="closePurchaseModal()" class="flex-1 border border-gray-300 py-2 rounded-lg">Cancelar</button>
+                            <button type="submit" class="flex-1 bg-brand-green text-white py-2 rounded-lg font-semibold">Registrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>`;
+    },
+
+    customers() {
+        return `
+        <h2 class="text-2xl font-bold mb-6 text-brand-dark">Clientes Afiliados</h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b">
+                        <tr>
+                            <th class="text-left px-6 py-4 font-semibold">Nombre</th>
+                            <th class="text-left px-6 py-4 font-semibold">Teléfono</th>
+                            <th class="text-center px-6 py-4 font-semibold">Estado</th>
+                            <th class="text-right px-6 py-4 font-semibold">Puntos</th>
+                            <th class="text-right px-6 py-4 font-semibold">Total Comprado</th>
+                            <th class="text-center px-6 py-4 font-semibold">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        ${Store.data.customers.map(c => {
+                            const isActive = c.status !== 'frozen';
+                            return `
+                            <tr class="hover:bg-gray-50 transition ${!isActive ? 'bg-gray-50 opacity-75' : ''}">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 ${isActive ? 'bg-brand-green/10 text-brand-green' : 'bg-gray-200 text-gray-500'} rounded-full flex items-center justify-center">
+                                            <i class="fas fa-user text-xs"></i>
+                                        </div>
+                                        <span class="font-medium">${c.name} ${c.lastname || ''}</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">${c.phone}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase ${isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                                        ${isActive ? 'Activo' : 'Congelado'}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <span class="bg-brand-orange/10 text-brand-orange px-2 py-1 rounded-full font-bold text-xs">${c.points || 0} pts</span>
+                                </td>
+                                <td class="px-6 py-4 text-right font-mono">$${(c.totalSpent || 0).toFixed(2)}</td>
+                                <td class="px-6 py-4 text-center flex justify-center gap-2">
+                                    <button onclick="toggleCustomerStatus(${c.id}, '${c.status}')" class="p-2 ${isActive ? 'text-orange-500' : 'text-green-600'} hover:bg-gray-100 rounded-lg transition" title="${isActive ? 'Congelar' : 'Activar'}">
+                                        <i class="fas ${isActive ? 'fa-snowflake' : 'fa-play'}"></i>
+                                    </button>
+                                    <button onclick="removeCustomer(${c.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" title="Eliminar">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>`;
+                        }).join('') || '<tr><td colspan="6" class="p-8 text-center text-gray-400">No hay clientes afiliados</td></tr>'}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+    },
+
+    promos() {
+        return `
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-brand-dark">Promociones y Ofertas</h2>
+            <button onclick="toggleGlobalPromo()" class="bg-brand-orange hover:bg-brand-lightorange text-white px-4 py-2 rounded-lg font-semibold transition">
+                <i class="fas fa-bullhorn mr-2"></i>Nueva Promoción
+            </button>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+            ${Store.data.products.filter(p => p.promo).map(p => `
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-4">
+                    ${isImageUrl(p.image) ? `<img src="${p.image}" class="w-16 h-16 rounded-xl object-cover" onerror="handleImageError(this)" data-category="${p.category}">` : `<div class="text-4xl">${p.image || '📦'}</div>`}
+                    <div class="flex-1">
+                        <h3 class="font-bold">${p.name}</h3>
+                        <p class="text-sm text-gray-500">${p.presentation === 'unidad' ? 'Unidad' : p.presentation + ' • ' + p.weight + 'kg'}</p>
+                        <div class="flex items-center gap-2 mt-2">
+                            <span class="text-lg font-bold text-brand-green">$${p.promoPrice?.toFixed(2)}</span>
+                            <span class="text-sm text-gray-400 line-through">$${p.price.toFixed(2)}</span>
+                            <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full">-${Math.round((1 - p.promoPrice/p.price)*100)}%</span>
+                        </div>
+                    </div>
+                    <button onclick="removePromo(${p.id})" class="text-red-500 hover:text-red-700 p-2"><i class="fas fa-times-circle text-xl"></i></button>
+                </div>
+            `).join('') || '<div class="col-span-2 text-center py-12 text-gray-400">No hay promociones activas</div>'}
+        </div>`;
+    },
+
+    balance() {
+        const orders = Store.data.orders;
+        const purchases = Store.data.purchases;
+        const expenses = Store.data.expenses;
+
+        const totalSales = orders.reduce((s,o) => s + o.total, 0);
+        const totalPurchases = purchases.reduce((s,p) => s + p.total, 0);
+        const totalExpenses = expenses.reduce((s,e) => s + e.amount, 0);
+        const cogs = orders.reduce((s,o) => s + o.items.reduce((is,i) => is + (i.cost * i.qty), 0), 0);
+        const grossProfit = totalSales - cogs;
+        const netProfit = grossProfit - totalExpenses;
+
+        return `
+        <h2 class="text-2xl font-bold mb-6 text-brand-dark">Balance de Ganancias y Pérdidas</h2>
+
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <p class="text-gray-500 text-sm mb-1">Ingresos por Ventas</p>
+                <p class="text-3xl font-bold text-brand-green">$${totalSales.toFixed(2)}</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <p class="text-gray-500 text-sm mb-1">Costo de Ventas</p>
+                <p class="text-3xl font-bold text-red-500">$${cogs.toFixed(2)}</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <p class="text-gray-500 text-sm mb-1">Ganancia Bruta</p>
+                <p class="text-3xl font-bold ${grossProfit>=0?'text-brand-green':'text-red-500'}">$${grossProfit.toFixed(2)}</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+            <h3 class="font-bold text-lg mb-4">Resumen Financiero</h3>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center p-4 bg-green-50 rounded-xl">
+                    <span class="font-semibold">Ventas Totales</span>
+                    <span class="font-bold text-brand-green text-xl">+ $${totalSales.toFixed(2)}</span>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-red-50 rounded-xl">
+                    <span class="font-semibold">Costo de Mercancía Vendida</span>
+                    <span class="font-bold text-red-500 text-xl">- $${cogs.toFixed(2)}</span>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
+                    <span class="font-semibold">Gastos Operativos</span>
+                    <span class="font-bold text-gray-600 text-xl">- $${totalExpenses.toFixed(2)}</span>
+                </div>
+                <div class="border-t-2 pt-4 flex justify-between items-center">
+                    <span class="font-bold text-lg">GANANCIA NETA</span>
+                    <span class="font-bold text-2xl ${netProfit>=0?'text-brand-green':'text-red-600'}">$${netProfit.toFixed(2)}</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4 mt-4">
+                    <div class="progress-bar bg-brand-green h-4 rounded-full" style="width: ${Math.min(100, Math.max(0, (netProfit/totalSales)*100))}%"></div>
+                </div>
+                <p class="text-center text-sm text-gray-500">Margen de utilidad: ${totalSales > 0 ? ((netProfit/totalSales)*100).toFixed(1) : 0}%</p>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h3 class="font-bold text-lg mb-4">Compras Recientes</h3>
+                <div class="space-y-3">
+                    ${purchases.slice(0,5).map(p => `
+                        <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                            <span class="text-sm">${p.supplier}</span>
+                            <span class="font-semibold text-sm">$${p.total.toFixed(2)}</span>
+                        </div>
+                    `).join('') || '<p class="text-gray-400 text-sm">Sin compras registradas</p>'}
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg">Gastos Operativos</h3>
+                    <button onclick="openExpenseModal()" class="text-brand-green text-sm font-semibold hover:underline">+ Agregar</button>
+                </div>
+                <div class="space-y-3">
+                    ${expenses.map(e => `
+                        <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <span class="text-sm font-medium">${e.description}</span>
+                                <p class="text-xs text-gray-500">${new Date(e.date).toLocaleDateString()}</p>
+                            </div>
+                            <span class="font-semibold text-sm text-red-500">-$${e.amount.toFixed(2)}</span>
+                        </div>
+                    `).join('') || '<p class="text-gray-400 text-sm">Sin gastos registrados</p>'}
+                </div>
+            </div>
+        </div>
+
+        <div id="expense-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full fade-in p-6">
+                <h3 class="text-xl font-bold mb-4">Registrar Gasto</h3>
+                <form onsubmit="saveExpense(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Descripción</label>
+                        <input type="text" id="exp-desc" required class="w-full border rounded-lg px-4 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Monto ($)</label>
+                        <input type="number" id="exp-amount" step="0.01" required class="w-full border rounded-lg px-4 py-2">
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeExpenseModal()" class="flex-1 border border-gray-300 py-2 rounded-lg">Cancelar</button>
+                        <button type="submit" class="flex-1 bg-brand-green text-white py-2 rounded-lg font-semibold">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>`;
+    },
+
+    settings() {
+        return `
+        <h2 class="text-2xl font-bold mb-6 text-brand-dark">Configuración</h2>
+        <div class="max-w-lg bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h3 class="font-bold text-lg mb-4">Configuración de Puntos</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Tasa de puntos (pts por $1)</label>
+                    <input type="number" id="set-rate" value="${Store.data.settings.pointRate}" step="0.01" class="w-full border rounded-lg px-4 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Valor del punto ($)</label>
+                    <input type="number" id="set-value" value="${Store.data.settings.pointValue}" step="0.01" class="w-full border rounded-lg px-4 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Mínimo para envío gratis ($)</label>
+                    <input type="number" id="set-shipping" value="${Store.data.settings.freeShippingMin}" step="1" class="w-full border rounded-lg px-4 py-2">
+                </div>
+                <button onclick="saveSettings()" class="w-full bg-brand-green hover:bg-brand-dark text-white py-2 rounded-lg font-semibold transition">Guardar Configuración</button>
+            </div>
+
+            <div class="mt-8 pt-6 border-t">
+                <h3 class="font-bold text-lg mb-4 text-red-600">Zona Peligrosa</h3>
+                <button onclick="resetData()" class="w-full border border-red-300 text-red-600 hover:bg-red-50 py-2 rounded-lg font-semibold transition">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>Restablecer Datos de Demo
+                </button>
+            </div>
+        </div>`;
+    }
+};
+
+// ==================== CART FUNCTIONS ====================
+function addToCart(productId, qty = 1) {
+    const product = Store.getProduct(productId);
+    if (!product) return;
+    if (product.active === false) {
+        showToast('Este producto no está disponible actualmente', 'error');
+        return;
+    }
+
+    const existing = Store.data.cart.find(item => item.productId === productId);
+    if (existing) {
+        existing.qty += qty;
+    } else {
+        Store.data.cart.push({
+            productId: product.id,
+            name: product.name,
+            price: product.promo ? product.promoPrice : product.price,
+            originalPrice: product.price,
+            image: product.image,
+            category: product.category,
+            qty: qty,
+            presentation: product.presentation,
+            weight: product.weight
+        });
+    }
+    Store.save();
+    updateCartUI();
+    showToast(`${product.name} agregado al carrito`, 'success');
+}
+
+function removeFromCart(productId) {
+    Store.data.cart = Store.data.cart.filter(item => item.productId !== productId);
+    Store.save();
+    updateCartUI();
+}
+
+function updateCartQty(productId, delta) {
+    const item = Store.data.cart.find(i => i.productId === productId);
+    if (item) {
+        item.qty = Math.max(1, item.qty + delta);
+        Store.save();
+        updateCartUI();
+    }
+}
+
+function updateCartUI() {
+    const badge = document.getElementById('cart-badge');
+    const itemsContainer = document.getElementById('cart-items');
+    const subtotalEl = document.getElementById('cart-subtotal');
+    const totalEl = document.getElementById('cart-total');
+
+    const totalItems = Store.data.cart.reduce((s, i) => s + i.qty, 0);
+    const subtotal = Store.data.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+
+    if (badge) {
+        badge.textContent = totalItems;
+        badge.classList.toggle('hidden', totalItems === 0);
+    }
+
+    if (itemsContainer) {
+        if (Store.data.cart.length === 0) {
+            itemsContainer.innerHTML = `
+                <div class="text-center py-12">
+                    <i class="fas fa-shopping-basket text-4xl text-gray-300 mb-3"></i>
+                    <p class="text-gray-400">Tu carrito está vacío</p>
+                    <button onclick="toggleCart(); router.navigate('catalog')" class="mt-4 text-brand-green font-semibold hover:underline">Ir al catálogo</button>
+                </div>`;
+        } else {
+            itemsContainer.innerHTML = Store.data.cart.map(item => `
+                <div class="flex gap-3 bg-gray-50 rounded-xl p-3">
+                    ${isImageUrl(item.image) ? `<img src="${item.image}" class="w-12 h-12 rounded-lg object-cover" onerror="handleImageError(this)" data-category="${item.category || ''}">` : `<div class="text-3xl">${item.image || '📦'}</div>`}
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-semibold text-sm truncate">${item.name}</h4>
+                        <p class="text-xs text-gray-500">$${item.price.toFixed(2)} c/u</p>
+                        <div class="flex items-center gap-2 mt-2">
+                            <button onclick="updateCartQty(${item.productId}, -1)" class="w-6 h-6 rounded-full bg-white border flex items-center justify-center text-xs hover:bg-gray-100">-</button>
+                            <span class="text-sm font-semibold w-6 text-center">${item.qty}</span>
+                            <button onclick="updateCartQty(${item.productId}, 1)" class="w-6 h-6 rounded-full bg-white border flex items-center justify-center text-xs hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-sm">$${(item.price * item.qty).toFixed(2)}</p>
+                        <button onclick="removeFromCart(${item.productId})" class="text-red-400 hover:text-red-600 text-xs mt-1"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
+    if (subtotalEl) subtotalEl.textContent = '$' + subtotal.toFixed(2);
+    if (totalEl) totalEl.textContent = '$' + subtotal.toFixed(2);
+}
+
+function toggleCart() {
+    const sidebar = document.getElementById('cart-sidebar');
+    const overlay = document.getElementById('cart-overlay');
+    const isOpen = !sidebar.classList.contains('translate-x-full');
+
+    if (isOpen) {
+        sidebar.classList.add('translate-x-full');
+        overlay.classList.add('hidden');
+    } else {
+        sidebar.classList.remove('translate-x-full');
+        overlay.classList.remove('hidden');
+        updateCartUI();
+    }
+}
+
+// ==================== CHECKOUT ====================
+function checkout() {
+    if (Store.data.cart.length === 0) {
+        showToast('Tu carrito está vacío', 'error');
+        return;
+    }
+    toggleCart();
+    document.getElementById('checkout-modal').classList.remove('hidden');
+    document.getElementById('checkout-step-1').classList.remove('hidden');
+    document.getElementById('checkout-step-2').classList.add('hidden');
+    document.getElementById('checkout-success').classList.add('hidden');
+    updateCheckoutTotal();
+}
+
+function closeCheckout() {
+    document.getElementById('checkout-modal').classList.add('hidden');
+}
+
+function updateCheckoutTotal() {
+    const subtotal = Store.data.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+    document.getElementById('checkout-total').textContent = '$' + subtotal.toFixed(2);
+}
+
+function updateShipping() {
+    const municipio = document.getElementById('co-municipio').value;
+    const display = document.getElementById('shipping-cost-display');
+    const subtotal = Store.data.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+
+    if (municipio === 'garcia' && subtotal >= Store.data.settings.freeShippingMin) {
+        display.classList.add('hidden');
+    } else if (municipio === 'otro') {
+        display.classList.remove('hidden');
+    } else if (municipio === 'garcia' && subtotal < Store.data.settings.freeShippingMin) {
+        display.classList.remove('hidden');
+        display.innerHTML = '<i class="fas fa-info-circle mr-1"></i> Agrega $' + (Store.data.settings.freeShippingMin - subtotal).toFixed(2) + ' más para envío gratis en García.';
+    }
+}
+
+function goToPayment() {
+    const name = document.getElementById('co-name').value;
+    const phone = document.getElementById('co-phone').value;
+    const address = document.getElementById('co-address').value;
+
+    if (!name || !phone || !address) {
+        showToast('Completa todos los campos', 'error');
+        return;
+    }
+
+    document.getElementById('checkout-step-1').classList.add('hidden');
+    document.getElementById('checkout-step-2').classList.remove('hidden');
+}
+
+function backToStep1() {
+    document.getElementById('checkout-step-2').classList.add('hidden');
+    document.getElementById('checkout-step-1').classList.remove('hidden');
+}
+
+function processPayment() {
+    const ref = document.getElementById('co-ref').value;
+    if (!ref) {
+        showToast('Ingresa la referencia de pago', 'error');
+        return;
+    }
+
+    const name = document.getElementById('co-name').value;
+    const phone = document.getElementById('co-phone').value;
+    const address = document.getElementById('co-address').value;
+    const municipio = document.getElementById('co-municipio').value;
+
+    const subtotal = Store.data.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+
+    // Check if affiliated customer
+    const customer = Store.getCustomerByPhone(phone);
+
+    const order = {
+        customerName: name,
+        customerPhone: phone,
+        customerId: customer ? customer.id : null,
+        address: address,
+        municipio: municipio,
+        items: Store.data.cart.map(i => ({
+            productId: i.productId,
+            name: i.name,
+            qty: i.qty,
+            price: i.price,
+            cost: Store.getProduct(i.productId)?.cost || 0
+        })),
+        total: subtotal,
+        costTotal: Store.data.cart.reduce((s, i) => s + ((Store.getProduct(i.productId)?.cost || 0) * i.qty), 0),
+        status: 'pending',
+        paymentRef: ref,
+        paymentMethod: 'pago-movil'
+    };
+
+    const savedOrder = Store.addOrder(order);
+    Store.data.cart = [];
+    Store.save();
+    updateCartUI();
+
+    document.getElementById('order-number').textContent = savedOrder.number;
+    document.getElementById('checkout-step-2').classList.add('hidden');
+    document.getElementById('checkout-success').classList.remove('hidden');
+}
+
+// ==================== AFFILIATE ====================
+function showAffiliateModal() {
+    document.getElementById('affiliate-modal').classList.remove('hidden');
+}
+
+function closeAffiliateModal() {
+    document.getElementById('affiliate-modal').classList.add('hidden');
+}
+
+function registerAffiliate(e) {
+    e.preventDefault();
+    const customer = {
+        name: document.getElementById('aff-name').value,
+        lastname: document.getElementById('aff-lastname').value,
+        phone: document.getElementById('aff-phone').value,
+        email: document.getElementById('aff-email').value,
+        address: document.getElementById('aff-address').value
+    };
+
+    const saved = Store.addCustomer(customer);
+    showToast('¡Registro exitoso! Bienvenido al programa de afiliados', 'success');
+    document.getElementById('affiliate-form').reset();
+}
+
+function checkPoints() {
+    const phone = document.getElementById('check-phone').value;
+    const customer = Store.getCustomerByPhone(phone);
+    const result = document.getElementById('points-result');
+
+    if (customer) {
+        if (customer.status === 'frozen') {
+            result.innerHTML = `
+                <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+                    <div class="flex justify-center mb-2"><i class="fas fa-snowflake text-3xl text-red-500"></i></div>
+                    <p class="text-sm text-red-600 font-bold uppercase">Cuenta Congelada</p>
+                    <p class="text-sm text-red-600 mt-1">Actualmente no puedes acumular ni canjear puntos. Por favor, comunícate con nosotros.</p>
+                </div>
+            `;
+        } else {
+            result.innerHTML = `
+                <div class="bg-brand-green/10 border border-brand-green/20 rounded-xl p-4 text-center">
+                    <p class="text-sm text-gray-600">Hola, <strong>${customer.name}</strong></p>
+                    <p class="text-3xl font-bold text-brand-green my-2">${customer.points || 0} puntos</p>
+                    <p class="text-xs text-gray-500">Total comprado: $${(customer.totalSpent || 0).toFixed(2)}</p>
+                    <p class="text-xs text-brand-orange mt-2">${customer.points >= 50 ? '¡Tienes puntos disponibles para canjear!' : 'Acumula más puntos para obtener descuentos.'}</p>
+                </div>
+            `;
+        }
+        result.classList.remove('hidden');
+    } else {
+        result.innerHTML = `
+            <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+                <p class="text-sm text-red-600">No encontramos un afiliado con ese teléfono.</p>
+            </div>
+        `;
+        result.classList.remove('hidden');
+    }
+}
+
+// ==================== ADMIN FUNCTIONS ====================
+let currentAdminTab = 'dash';
+let isAdminLoggedIn = false;
+
+function loginAdmin() {
+    const pass = document.getElementById('admin-pass').value;
+    if (pass === Store.data.adminPassword) {
+        isAdminLoggedIn = true;
+        document.getElementById('admin-login').classList.add('hidden');
+        document.getElementById('admin-dashboard').classList.remove('hidden');
+        switchAdminTab('dash');
+        showToast('Bienvenido al panel de administración', 'success');
+    } else {
+        showToast('Contraseña incorrecta', 'error');
+    }
+}
+
+function logoutAdmin() {
+    isAdminLoggedIn = false;
+    document.getElementById('admin-login').classList.remove('hidden');
+    document.getElementById('admin-dashboard').classList.add('hidden');
+    document.getElementById('admin-pass').value = '';
+    router.navigate('home');
+}
+
+function switchAdminTab(tab) {
+    currentAdminTab = tab;
+    document.querySelectorAll('.admin-tab').forEach(el => el.classList.remove('bg-white/20'));
+    const activeTab = document.getElementById('tab-' + tab);
+    if (activeTab) activeTab.classList.add('bg-white/20');
+
+    const content = document.getElementById('admin-content');
+    if (adminTabs[tab]) {
+        content.innerHTML = adminTabs[tab]();
+    }
+}
+
+function attachAdminEvents() {
+    if (isAdminLoggedIn) {
+        document.getElementById('admin-login').classList.add('hidden');
+        document.getElementById('admin-dashboard').classList.remove('hidden');
+        switchAdminTab(currentAdminTab);
+    }
+}
+
+// Ventas CRUD (Eliminar)
+function deleteOrderFromAdmin(orderId) {
+    if(confirm("¿Estás seguro de que deseas anular esta venta? El stock regresará al inventario y se descontarán los puntos al cliente.")) {
+        Store.deleteOrder(orderId);
+        showToast("Venta anulada correctamente", "success");
+        switchAdminTab('sales'); // Actualiza la pantalla
+        updateCartUI(); // Por si el stock cambió
+    }
+}
+
+function cycleOrderStatus(orderId) {
+    const order = Store.data.orders.find(o => o.id === orderId);
+    if (!order) return;
+
+    const cycle = { 'pending': 'processing', 'processing': 'completed', 'completed': 'pending' };
+    const nextStatus = cycle[order.status] || 'pending';
+
+    Store.updateOrderStatus(orderId, nextStatus);
+    showToast(`Estado actualizado a: ${nextStatus === 'completed' ? 'Completado' : nextStatus === 'processing' ? 'Procesando' : 'Pendiente'}`, 'success');
+    switchAdminTab('sales');
+}
+
+// Customer Freeze/Delete
+function toggleCustomerStatus(id, currentStatus) {
+    const nextStatus = currentStatus === 'frozen' ? 'active' : 'frozen';
+    const msg = nextStatus === 'frozen' ? '¿Congelar afiliación? El cliente no podrá sumar ni usar puntos.' : '¿Reactivar afiliación?';
+    
+    if (confirm(msg)) {
+        Store.updateCustomerStatus(id, nextStatus);
+        showToast(nextStatus === 'frozen' ? 'Afiliación congelada' : 'Afiliación reactivada', 'info');
+        switchAdminTab('customers');
+    }
+}
+
+function removeCustomer(id) {
+    if (confirm('¿Estás seguro de eliminar permanentemente este afiliado? Esta acción no se puede deshacer.')) {
+        Store.deleteCustomer(id);
+        showToast('Afiliado eliminado con éxito', 'success');
+        switchAdminTab('customers');
+    }
+}
+
+
+// Product CRUD
+function previewProductImage() {
+    const url = document.getElementById('pm-image-url').value.trim();
+    const preview = document.getElementById('pm-image-preview');
+    const fallback = document.getElementById('pm-image-preview-fallback');
+    const status = document.getElementById('pm-image-status');
+
+    if (url && isImageUrl(url)) {
+        preview.src = url;
+        status.textContent = 'Cargando imagen...';
+        status.className = 'text-xs text-brand-orange';
+    } else if (url) {
+        preview.classList.add('hidden');
+        fallback.classList.remove('hidden');
+        status.textContent = 'URL no válida. Debe empezar con http:// o https://';
+        status.className = 'text-xs text-red-500';
+    } else {
+        const cat = document.getElementById('pm-category').value;
+        preview.src = CATEGORY_IMAGES[cat] || DEFAULT_PRODUCT_IMAGE;
+        preview.classList.remove('hidden');
+        fallback.classList.add('hidden');
+        status.textContent = 'Imagen por categoría: ' + (cat || 'general');
+        status.className = 'text-xs text-brand-green';
+    }
+}
+
+function openProductModal(productId = null) {
+    const modal = document.getElementById('product-modal');
+    const form = document.getElementById('product-form');
+    form.reset();
+
+    if (productId) {
+        const p = Store.getProduct(productId);
+        document.getElementById('pm-id').value = p.id;
+        document.getElementById('pm-name').value = p.name;
+        document.getElementById('pm-category').value = p.category;
+        document.getElementById('pm-category').onchange = function() { previewProductImage(); };
+        document.getElementById('pm-type').value = p.type;
+        document.getElementById('pm-presentation').value = p.presentation;
+        document.getElementById('pm-weight').value = p.weight;
+        document.getElementById('pm-stock').value = p.stock;
+        document.getElementById('pm-cost').value = p.cost;
+        document.getElementById('pm-price').value = p.price;
+        document.getElementById('pm-promo').checked = p.promo || false;
+        document.getElementById('pm-promo-price').value = p.promoPrice || '';
+        document.getElementById('pm-image-url').value = (isImageUrl(p.image) && !p.image.includes('placehold.co')) ? p.image : '';
+        document.getElementById('pm-active').checked = p.active !== false;
+        document.getElementById('pm-title').textContent = 'Editar Producto';
+    } else {
+        document.getElementById('pm-id').value = '';
+        document.getElementById('pm-title').textContent = 'Nuevo Producto';
+        document.getElementById('pm-active').checked = true;
+        document.getElementById('pm-category').onchange = function() { previewProductImage(); };
+    }
+
+    document.getElementById('pm-promo').onchange = function() {
+        document.getElementById('pm-promo-price-container').classList.toggle('hidden', !this.checked);
+    };
+    document.getElementById('pm-promo-price-container').classList.toggle('hidden', !document.getElementById('pm-promo').checked);
+
+    previewProductImage();
+    modal.classList.remove('hidden');
+}
+
+function closeProductModal() {
+    document.getElementById('product-modal').classList.add('hidden');
+}
+
+function saveProduct(e) {
+    e.preventDefault();
+    const id = document.getElementById('pm-id').value;
+    const imgUrl = document.getElementById('pm-image-url').value.trim();
+    const category = document.getElementById('pm-category').value;
+    const product = {
+        name: document.getElementById('pm-name').value,
+        category: category,
+        type: document.getElementById('pm-type').value,
+        presentation: document.getElementById('pm-presentation').value,
+        weight: parseFloat(document.getElementById('pm-weight').value),
+        stock: parseInt(document.getElementById('pm-stock').value),
+        cost: parseFloat(document.getElementById('pm-cost').value),
+        price: parseFloat(document.getElementById('pm-price').value),
+        promo: document.getElementById('pm-promo').checked,
+        promoPrice: document.getElementById('pm-promo').checked ? parseFloat(document.getElementById('pm-promo-price').value) : null,
+        active: document.getElementById('pm-active').checked,
+        image: imgUrl || CATEGORY_IMAGES[category] || '📦'
+    };
+
+    if (id) {
+        Store.updateProduct(parseInt(id), product);
+        showToast('Producto actualizado', 'success');
+    } else {
+        Store.addProduct(product);
+        showToast('Producto creado', 'success');
+    }
+    closeProductModal();
+    switchAdminTab('inventory');
+}
+
+function editProduct(id) {
+    // Need to re-render inventory tab to ensure modal exists
+    switchAdminTab('inventory');
+    setTimeout(() => openProductModal(id), 100);
+}
+
+function deleteProduct(id) {
+    if (confirm('¿Eliminar este producto?')) {
+        Store.deleteProduct(id);
+        showToast('Producto eliminado', 'success');
+        switchAdminTab('inventory');
+    }
+}
+
+// Purchase
+function openPurchaseModal() {
+    document.getElementById('purchase-modal').classList.remove('hidden');
+}
+
+function closePurchaseModal() {
+    document.getElementById('purchase-modal').classList.add('hidden');
+}
+
+function savePurchase(e) {
+    e.preventDefault();
+    const productId = parseInt(document.getElementById('pur-product').value);
+    const qty = parseInt(document.getElementById('pur-qty').value);
+    const cost = parseFloat(document.getElementById('pur-cost').value);
+
+    const purchase = {
+        supplier: document.getElementById('pur-supplier').value,
+        items: [{ productId, qty, cost }],
+        total: qty * cost
+    };
+
+    Store.addPurchase(purchase);
+    showToast('Compra registrada y stock actualizado', 'success');
+    closePurchaseModal();
+    switchAdminTab('purchases');
+}
+
+// Expense
+function openExpenseModal() {
+    document.getElementById('expense-modal').classList.remove('hidden');
+}
+
+function closeExpenseModal() {
+    document.getElementById('expense-modal').classList.add('hidden');
+}
+
+function saveExpense(e) {
+    e.preventDefault();
+    Store.addExpense({
+        description: document.getElementById('exp-desc').value,
+        amount: parseFloat(document.getElementById('exp-amount').value)
+    });
+    showToast('Gasto registrado', 'success');
+    closeExpenseModal();
+    switchAdminTab('balance');
+}
+
+// Promo
+function filterInventory() {
+    const filter = document.getElementById('inv-status-filter').value;
+    const rows = document.querySelectorAll('#inventory-table tbody tr');
+    rows.forEach(row => {
+        const status = row.dataset.status;
+        if (filter === 'all') {
+            row.style.display = '';
+        } else if (filter === 'active') {
+            row.style.display = status === 'active' ? '' : 'none';
+        } else if (filter === 'inactive') {
+            row.style.display = status === 'inactive' ? '' : 'none';
+        }
+    });
+}
+
+function toggleProductActive(id) {
+    const p = Store.getProduct(id);
+    if (!p) return;
+    const newStatus = p.active !== false ? false : true;
+    Store.updateProduct(id, { active: newStatus });
+    showToast(newStatus ? 'Producto activado' : 'Producto desactivado', newStatus ? 'success' : 'info');
+    switchAdminTab('inventory');
+}
+
+function consultWhatsApp(productId) {
+    const p = Store.getProduct(productId);
+    if (!p) return;
+    const text = `Hola Ferreagro El Conuco, quiero consultar sobre el producto:%0A%0A` +
+                 `*${p.name}*%0A` +
+                 `Categoría: ${p.category}%0A` +
+                 `Presentación: ${p.presentation}%0A` +
+                 `Precio: $${p.price.toFixed(2)}%0A` +
+                 `Stock disponible: ${p.stock}%0A%0A` +
+                 `¿Está disponible?`;
+    window.open(`https://wa.me/584123521113?text=${text}`, '_blank');
+}
+
+function checkoutWhatsApp() {
+    const name = document.getElementById('co-name').value.trim();
+    const phone = document.getElementById('co-phone').value.trim();
+    const address = document.getElementById('co-address').value.trim();
+    const municipio = document.getElementById('co-municipio').value;
+
+    if (!name || !phone || !address) {
+        showToast('Completa todos los campos para enviar el pedido por WhatsApp', 'error');
+        return;
+    }
+
+    if (Store.data.cart.length === 0) {
+        showToast('Tu carrito está vacío', 'error');
+        return;
+    }
+
+    const subtotal = Store.data.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+
+    let text = `*Nuevo Pedido - Ferreagro El Conuco*%0A%0A`;
+    text += `*Cliente:* ${name}%0A`;
+    text += `*Teléfono:* ${phone}%0A`;
+    text += `*Dirección:* ${address}%0A`;
+    text += `*Municipio:* ${municipio === 'garcia' ? 'García' : 'Otro'}%0A%0A`;
+    text += `*Productos:*%0A`;
+    Store.data.cart.forEach((item, idx) => {
+        text += `${idx + 1}. ${item.name} x${item.qty} = $${(item.price * item.qty).toFixed(2)}%0A`;
+    });
+    text += `%0A*Total: $${subtotal.toFixed(2)}*%0A`;
+    text += `%0APor favor confirmar disponibilidad y método de pago. ¡Gracias!`;
+
+    // Save as pending order
+    const order = {
+        customerName: name,
+        customerPhone: phone,
+        customerId: null,
+        address: address,
+        municipio: municipio,
+        items: Store.data.cart.map(i => ({
+            productId: i.productId,
+            name: i.name,
+            qty: i.qty,
+            price: i.price,
+            cost: Store.getProduct(i.productId)?.cost || 0
+        })),
+        total: subtotal,
+        costTotal: Store.data.cart.reduce((s, i) => s + ((Store.getProduct(i.productId)?.cost || 0) * i.qty), 0),
+        status: 'pending',
+        paymentRef: 'whatsapp-pending',
+        paymentMethod: 'whatsapp'
+    };
+
+    Store.addOrder(order);
+    Store.data.cart = [];
+    Store.save();
+    updateCartUI();
+    closeCheckout();
+
+    window.open(`https://wa.me/584123521113?text=${text}`, '_blank');
+    showToast('Pedido enviado por WhatsApp', 'success');
+}
+
+function toggleGlobalPromo() {
+    switchAdminTab('inventory');
+    showToast('Selecciona un producto y activa "En promoción" para crear una oferta', 'info');
+}
+
+function removePromo(productId) {
+    Store.updateProduct(productId, { promo: false, promoPrice: null });
+    showToast('Promoción eliminada', 'success');
+    switchAdminTab('promos');
+}
+
+// Settings
+function saveSettings() {
+    Store.data.settings.pointRate = parseFloat(document.getElementById('set-rate').value);
+    Store.data.settings.pointValue = parseFloat(document.getElementById('set-value').value);
+    Store.data.settings.freeShippingMin = parseFloat(document.getElementById('set-shipping').value);
+    Store.save();
+    showToast('Configuración guardada', 'success');
+}
+
+function resetData() {
+    if (confirm('¿Restablecer todos los datos a los valores de demostración?')) {
+        localStorage.removeItem('ferreagro_data');
+        Store.init();
+        showToast('Datos restablecidos', 'success');
+        switchAdminTab('dash');
+    }
+}
+
+// ==================== CATALOG FUNCTIONS ====================
+function attachCatalogEvents() {
+    filterCatalog();
+}
+
+function filterCatalog() {
+    const search = (document.getElementById('catalog-search')?.value || '').toLowerCase();
+    const cat = document.querySelector('input[name="cat-filter"]:checked')?.value || 'all';
+    const type = document.querySelector('input[name="type-filter"]:checked')?.value || 'all';
+    const promoOnly = document.getElementById('promo-only')?.checked || false;
+
+    let filtered = Store.data.products.filter(p => {
+        if (search && !p.name.toLowerCase().includes(search)) return false;
+        if (cat !== 'all' && p.category !== cat) return false;
+        if (type !== 'all' && p.type !== type) return false;
+        if (promoOnly && !p.promo) return false;
+        return true;
+    });
+
+    const grid = document.getElementById('catalog-grid');
+    const count = document.getElementById('results-count');
+    if (grid) grid.innerHTML = filtered.map(p => renderProductCard(p)).join('');
+    if (count) count.textContent = filtered.length + ' productos';
+}
+
+function filterByCategory(cat) {
+    router.navigate('catalog');
+    setTimeout(() => {
+        const radios = document.querySelectorAll('input[name="cat-filter"]');
+        radios.forEach(r => { if (r.value === cat) r.checked = true; });
+        filterCatalog();
+    }, 100);
+}
+
+function quickView(productId) {
+    const p = Store.getProduct(productId);
+    showToast(`${p.name} - $${p.price.toFixed(2)} (${p.stock} disponibles)`, 'info');
+}
+
+// ==================== UTILITIES ====================
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    const colors = {
+        success: 'bg-brand-green text-white',
+        error: 'bg-red-500 text-white',
+        info: 'bg-gray-800 text-white'
+    };
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        info: 'fa-info-circle'
+    };
+
+    toast.className = `${colors[type]} px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 fade-in transform transition-all duration-300`;
+    toast.innerHTML = `<i class="fas ${icons[type]}"></i><span class="font-medium">${message}</span>`;
+
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function toggleMobileMenu() {
+    document.getElementById('mobile-menu').classList.toggle('hidden');
+}
+
+// ==================== DISPATCH NOTE ====================
+let currentDispatchOrderId = null;
+
+function openDispatchNote(orderId) {
+    const order = Store.data.orders.find(o => o.id === orderId);
+    if (!order) return;
+    currentDispatchOrderId = orderId;
+
+    const container = document.getElementById('dispatch-content');
+    const date = new Date(order.date).toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    container.innerHTML = `
+        <div id="dispatch-note-printable" class="bg-white p-6" style="font-family: 'Inter', sans-serif;">
+            <div class="flex items-center justify-between border-b-2 border-brand-green pb-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <svg class="w-12 h-12" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#2D7D32"/><circle cx="50" cy="50" r="44" fill="none" stroke="#FFF8E1" stroke-width="1" opacity="0.25"/><path d="M6 52 Q25 42 50 52 Q75 62 94 52" fill="none" stroke="#1B5E20" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/><path d="M10 60 Q28 50 50 60 Q72 70 90 60" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" opacity="0.5"/><path d="M14 68 Q30 58 50 68 Q70 78 86 68" fill="none" stroke="#1B5E20" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/><path d="M50 72 L50 38" fill="none" stroke="#4CAF50" stroke-width="3" stroke-linecap="round"/><path d="M50 55 Q35 48 32 40 Q40 46 50 52" fill="#66BB6A"/><path d="M50 48 Q65 41 68 33 Q60 39 50 45" fill="#66BB6A"/><path d="M50 42 Q42 34 44 26 Q48 34 50 38" fill="#81C784"/><ellipse cx="50" cy="30" rx="4.5" ry="9" fill="#F57C00"/><ellipse cx="50" cy="30" rx="2.5" ry="6" fill="#FF9800"/></svg>
+                    <div>
+                        <h1 class="text-2xl font-bold text-brand-green leading-tight">FERREAGRO</h1>
+                        <p class="text-lg text-brand-orange font-bold tracking-wider">EL CONUCO</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-gray-500 uppercase tracking-wide">Nota de Despacho</p>
+                    <p class="text-xl font-bold text-brand-dark">${order.number}</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 mb-6 text-sm">
+                <div>
+                    <p class="text-gray-500 mb-1 text-xs uppercase">Cliente</p>
+                    <p class="font-bold text-gray-800">${order.customerName || 'Cliente General'}</p>
+                    <p class="text-gray-600">${order.customerPhone || ''}</p>
+                    <p class="text-gray-600 mt-1">${order.address || ''}</p>
+                    <p class="text-gray-600">${order.municipio === 'garcia' ? 'Municipio García' : 'Otro municipio'}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-500 mb-1 text-xs uppercase">Fecha</p>
+                    <p class="font-bold text-gray-800">${date}</p>
+                    <p class="text-gray-500 mt-2 mb-1 text-xs uppercase">Estado</p>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold ${order.status==='completed'?'bg-green-100 text-green-700':order.status==='pending'?'bg-yellow-100 text-yellow-700':'bg-blue-100 text-blue-700'}">
+                        ${order.status==='completed'?'Completado':order.status==='pending'?'Pendiente':'Procesando'}
+                    </span>
+                </div>
+            </div>
+
+            <table class="w-full text-sm mb-6">
+                <thead class="bg-brand-green text-white">
+                    <tr>
+                        <th class="text-left px-4 py-2 rounded-tl-lg">Producto</th>
+                        <th class="text-center px-4 py-2">Cant.</th>
+                        <th class="text-right px-4 py-2">P.Unit</th>
+                        <th class="text-right px-4 py-2 rounded-tr-lg">Total</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y border-x border-b border-gray-200">
+                    ${order.items.map((item, idx) => `
+                        <tr class="${idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}">
+                            <td class="px-4 py-3 font-medium">${item.name}</td>
+                            <td class="px-4 py-3 text-center">${item.qty}</td>
+                            <td class="px-4 py-3 text-right">$${item.price.toFixed(2)}</td>
+                            <td class="px-4 py-3 text-right font-semibold">$${(item.price * item.qty).toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+                <tfoot>
+                    <tr class="bg-brand-cream border-t-2 border-brand-green">
+                        <td colspan="3" class="px-4 py-3 text-right font-bold text-brand-dark">TOTAL:</td>
+                        <td class="px-4 py-3 text-right font-bold text-brand-green text-lg">$${order.total.toFixed(2)}</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="grid grid-cols-2 gap-8 mt-8 pt-8 border-t border-gray-200">
+                <div class="text-center">
+                    <div class="border-t border-gray-400 pt-2 mt-16">
+                        <p class="text-sm text-gray-600 font-semibold">Firma del Despachador</p>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="border-t border-gray-400 pt-2 mt-16">
+                        <p class="text-sm text-gray-600 font-semibold">Firma del Cliente</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center text-xs text-gray-400">
+                <p>Ferreagro El Conuco - Alimentos de calidad para tus animales</p>
+                <p>Tel: +58 412-3521113 | ferreagroelconuco@gmail.com | Municipio García, Venezuela</p>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-gray-200 text-center">
+                <p class="text-[10px] text-gray-400 tracking-widest uppercase font-semibold">NO SE ACEPTAN DEVOLUCIONES</p>
+            </div>
+        
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/584123521113?text=Hola%20Ferreagro%20El%20Conuco%2C%20quiero%20hacer%20un%20pedido" 
+       target="_blank" 
+       class="fixed bottom-6 left-6 z-40 bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition transform hover:scale-110 pulse-green"
+       title="Escríbenos por WhatsApp">
+        <i class="fab fa-whatsapp text-2xl"></i>
+    </a>
+</div>
+    `;
+
+    document.getElementById('dispatch-modal').classList.remove('hidden');
+}
+
+function closeDispatchNote() {
+    document.getElementById('dispatch-modal').classList.add('hidden');
+    currentDispatchOrderId = null;
+}
+
+async function downloadDispatchImage() {
+    const element = document.getElementById('dispatch-note-printable');
+    if (!element) return;
+
+    try {
+        const canvas = await html2canvas(element, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+        const link = document.createElement('a');
+        link.download = `Nota_Despacho_${currentDispatchOrderId}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Imagen descargada exitosamente', 'success');
+    } catch (err) {
+        showToast('Error al generar imagen', 'error');
+        console.error(err);
+    }
+}
+
+async function downloadDispatchPDF() {
+    const element = document.getElementById('dispatch-note-printable');
+    if (!element) return;
+
+    try {
+        const canvas = await html2canvas(element, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+        const imgData = canvas.toDataURL('image/png');
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, Math.min(pdfHeight, 280));
+        pdf.save(`Nota_Despacho_${currentDispatchOrderId}.pdf`);
+        showToast('PDF descargado exitosamente', 'success');
+    } catch (err) {
+        showToast('Error al generar PDF', 'error');
+        console.error(err);
+    }
+}
+
+function shareDispatchWhatsApp() {
+    const order = Store.data.orders.find(o => o.id === currentDispatchOrderId);
+    if (!order) return;
+
+    let text = `*Nota de Despacho - Ferreagro El Conuco*%0A%0A`;
+    text += `*Orden:* ${order.number}%0A`;
+    text += `*Cliente:* ${order.customerName || 'General'}%0A`;
+    text += `*Fecha:* ${new Date(order.date).toLocaleDateString('es-VE')}%0A%0A`;
+    text += `*Productos:*%0A`;
+    order.items.forEach(i => {
+        text += `• ${i.name} x${i.qty} = $${(i.price * i.qty).toFixed(2)}%0A`;
+    });
+    text += `%0A*Total: $${order.total.toFixed(2)}*%0A`;
+    text += `%0A¡Gracias por tu compra! 🐔🐷🐶🐱`;
+
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+
+function sendDispatchEmail() {
+    const order = Store.data.orders.find(o => o.id === currentDispatchOrderId);
+    if (!order) return;
+
+    let body = `Nota de Despacho - Ferreagro El Conuco\n\n`;
+    body += `Orden: ${order.number}\n`;
+    body += `Cliente: ${order.customerName || 'General'}\n`;
+    body += `Fecha: ${new Date(order.date).toLocaleDateString('es-VE')}\n\n`;
+    body += `Productos:\n`;
+    order.items.forEach(i => {
+        body += `• ${i.name} x${i.qty} = $${(i.price * i.qty).toFixed(2)}\n`;
+    });
+    body += `\nTotal: $${order.total.toFixed(2)}\n`;
+    body += `\nFerreagro El Conuco\n+58 412-3521113`;
+
+    window.open(`mailto:?subject=Nota de Despacho ${order.number}&body=${encodeURIComponent(body)}`, '_blank');
+}
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+    Store.init();
+    updateCartUI();
+    render();
+});
+</script>
+
+</body>
+</html>
