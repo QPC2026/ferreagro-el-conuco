@@ -1,6 +1,6 @@
 {
   "name": "ferreagro-el-conuco",
-  "version": "3.1",
+  "version": "3.0",
   "description": "Sistema de catálogo, carrito y administración para venta de alimentos agrícolas y para animales",
   "main": "index.html",
   "scripts": {
