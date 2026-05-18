@@ -177,7 +177,8 @@
                 <div class="flex justify-between text-sm"><span>Subtotal:</span><span id="cart-subtotal" class="font-semibold">$0.00</span></div>
                 <div class="flex justify-between text-sm"><span>Descuento Puntos:</span><span id="cart-discount" class="font-semibold text-brand-orange">-$0.00</span></div>
                 <div class="flex justify-between text-sm"><span>Envío:</span><span id="cart-shipping" class="font-semibold text-brand-green">Gratis</span></div>
-                <div class="border-t pt-2 flex justify-between text-lg font-bold"><span>Total:</span><span id="cart-total" class="text-brand-green">$0.00</span></div>
+                <div class="border-t pt-2 flex justify-between text-lg font-bold"><span>Total USD:</span><span id="cart-total" class="text-brand-green">$0.00</span></div>
+                <div class="flex justify-between text-xs text-brand-orange font-semibold bg-brand-cream rounded px-2 py-1"><span>Equivalente BCV:</span><span id="cart-total-bs">Bs 0,00</span></div>
             </div>
             <button onclick="checkout()" class="w-full bg-brand-orange hover:bg-brand-lightorange text-white font-bold py-3 rounded-xl transition pulse-green">
                 <i class="fas fa-credit-card mr-2"></i>Proceder al Pago
@@ -204,6 +205,21 @@
                             <label class="block text-sm font-medium mb-1">Nombre Completo</label>
                             <input type="text" id="co-name" class="w-full border rounded-lg px-4 py-2" placeholder="Tu nombre">
                         </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Tipo</label>
+                                <select id="co-id-type" class="w-full border rounded-lg px-4 py-2 bg-white">
+                                    <option value="V" selected>V</option>
+                                    <option value="E">E</option>
+                                    <option value="J">J</option>
+                                    <option value="G">G</option>
+                                </select>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium mb-1">Cédula / RIF</label>
+                                <input type="text" id="co-id-number" class="w-full border rounded-lg px-4 py-2" placeholder="Ej: 12345678">
+                            </div>
+                        </div>
                         <div>
                             <label class="block text-sm font-medium mb-1">Teléfono</label>
                             <input type="tel" id="co-phone" class="w-full border rounded-lg px-4 py-2" placeholder="0412-XXXXXXX">
@@ -223,12 +239,40 @@
                         <div id="shipping-cost-display" class="hidden p-3 bg-red-50 text-red-700 rounded-lg text-sm">
                             <i class="fas fa-exclamation-triangle mr-1"></i> Envío con costo adicional. Contactaremos para coordinar.
                         </div>
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <label class="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition">
+                                <input type="checkbox" id="co-credit" onchange="toggleCreditFields()" class="w-5 h-5 text-brand-orange rounded focus:ring-brand-orange">
+                                <div>
+                                    <p class="font-semibold text-sm text-gray-800">Venta a Crédito / Fiado</p>
+                                    <p class="text-xs text-gray-500">El cliente pagará en una fecha futura</p>
+                                </div>
+                            </label>
+                            <div id="credit-fields" class="hidden mt-3 space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Monto del Abono Inicial ($)</label>
+                                    <input type="number" id="co-credit-down" step="0.01" value="0" class="w-full border rounded-lg px-4 py-2" oninput="updateCreditPreview()">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Fecha Límite de Pago</label>
+                                    <input type="date" id="co-credit-due" class="w-full border rounded-lg px-4 py-2">
+                                </div>
+                                <div class="p-3 bg-brand-orange/10 rounded-lg border border-brand-orange/20">
+                                    <div class="flex justify-between text-sm mb-1"><span>Total Crédito:</span><span id="credit-total" class="font-bold">$0.00</span></div>
+                                    <div class="flex justify-between text-sm mb-1"><span>Abono:</span><span id="credit-down" class="font-bold text-brand-green">$0.00</span></div>
+                                    <div class="flex justify-between text-sm font-bold text-brand-orange"><span>Saldo Pendiente:</span><span id="credit-balance">$0.00</span></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mt-6 pt-4 border-t">
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="font-bold text-lg">Total a Pagar:</span>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-lg">Total a Pagar (USD):</span>
                             <span id="checkout-total" class="text-2xl font-bold text-brand-green">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-4 p-2 bg-brand-cream rounded-lg border border-brand-green/20">
+                            <span class="text-sm font-semibold text-brand-dark"><i class="fas fa-exchange-alt mr-1 text-brand-green"></i>Equivalente BCV:</span>
+                            <span id="checkout-total-bs" class="text-lg font-bold text-brand-orange">Bs 0,00</span>
                         </div>
                    
                         <button onclick="goToPayment()" class="w-full bg-brand-green hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition mb-3">
@@ -250,9 +294,15 @@
                     </div>
 
                     <div class="bg-brand-cream p-4 rounded-xl mb-4 border border-brand-green/20">
+                        <p class="text-xs font-bold text-brand-dark uppercase mb-2">Datos del Pago Móvil</p>
                         <div class="flex justify-between mb-2"><span class="text-sm">Banco:</span><span class="font-bold">Bancrecer</span></div>
                         <div class="flex justify-between mb-2"><span class="text-sm">Teléfono:</span><span class="font-bold">0412-3521113</span></div>
-                        <div class="flex justify-between"><span class="text-sm">Documento:</span><span class="font-bold">V6977409</span></div>
+                        <div class="flex justify-between mb-2"><span class="text-sm">Documento:</span><span class="font-bold">V6977409</span></div>
+                        <div class="border-t border-brand-green/20 mt-2 pt-2">
+                            <p class="text-xs font-bold text-brand-dark uppercase mb-1">Total a Pagar</p>
+                            <div class="flex justify-between"><span class="text-sm">USD:</span><span class="font-bold text-brand-green" id="pm-total-usd">$0.00</span></div>
+                            <div class="flex justify-between"><span class="text-sm">BS (BCV):</span><span class="font-bold text-brand-orange" id="pm-total-bs">Bs 0,00</span></div>
+                        </div>
                     </div>
 
                     <div class="mb-4">
@@ -284,6 +334,10 @@
                     <div class="bg-gray-50 p-4 rounded-lg mb-4">
                         <p class="text-sm text-gray-500">Número de orden:</p>
                         <p class="text-xl font-bold text-brand-dark" id="order-number">#0001</p>
+                        <p class="text-xs text-gray-500 mt-2">Total USD:</p>
+                        <p class="text-lg font-bold text-brand-green" id="order-total-usd">$0.00</p>
+                        <p class="text-xs text-gray-500 mt-1">Equivalente BCV:</p>
+                        <p class="text-base font-bold text-brand-orange" id="order-total-bs">Bs 0,00</p>
                     </div>
                     <button onclick="closeCheckout(); router.navigate('home')" class="bg-brand-green text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-dark transition">Volver al Inicio</button>
                 </div>
@@ -361,6 +415,53 @@
             </div>
         </div>
     </div>
+
+    <!-- Return Modal -->
+    <div id="return-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full fade-in shadow-2xl max-h-[95vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-purple-600"><i class="fas fa-undo-alt mr-2"></i>Registrar Devolución</h2>
+                    <button onclick="closeReturnModal()" class="p-2 hover:bg-gray-100 rounded-lg transition"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="return-order-info" class="p-3 bg-gray-50 rounded-lg mb-4 text-sm">
+                    <!-- Populated dynamically -->
+                </div>
+                <form id="return-form" onsubmit="saveReturn(event)" class="space-y-4">
+                    <input type="hidden" id="ret-order-id">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Productos a Devolver</label>
+                        <div id="return-items-list" class="space-y-2 max-h-60 overflow-y-auto">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Motivo de la Devolución</label>
+                        <select id="ret-reason" class="w-full border rounded-lg px-4 py-2">
+                            <option value="defective">Producto Defectuoso / Dañado</option>
+                            <option value="wrong">Error en el Pedido (producto equivocado)</option>
+                            <option value="expired">Producto Vencido</option>
+                            <option value="other">Otro (especificar en notas)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Notas Adicionales</label>
+                        <textarea id="ret-notes" rows="2" class="w-full border rounded-lg px-4 py-2" placeholder="Detalles de la devolución..."></textarea>
+                    </div>
+                    <div class="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                        <div class="flex justify-between text-sm mb-1"><span>Total a Reembolsar:</span><span id="ret-refund-total" class="font-bold text-purple-600">$0.00</span></div>
+                        <div class="flex justify-between text-sm"><span>Equivalente BCV:</span><span id="ret-refund-bs" class="font-bold text-brand-orange">Bs 0,00</span></div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeReturnModal()" class="flex-1 border border-gray-300 py-2 rounded-lg hover:bg-gray-50">Cancelar</button>
+                        <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg font-semibold transition">
+                            <i class="fas fa-check mr-1"></i>Confirmar Devolución
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div><script>
 // ==================== IMAGE SYSTEM ====================
 
@@ -405,6 +506,7 @@ function handleImageError(imgElement) {
 function isImageUrl(str) {
     if (!str || typeof str !== 'string') return false;
     const s = str.trim().toLowerCase();
+    // Acepta links normales, protocolo seguro, imágenes en base64 y subdominios como i.ibb.co
     return s.startsWith('http://') || s.startsWith('https://') || s.startsWith('data:') || s.startsWith('//');
 }
 
@@ -445,9 +547,14 @@ const Store = {
         purchases: [],
         expenses: [],
         promos: [],
+        credits: [],
+        payables: [],
+        dailyClosures: [],
+        returns: [],
+        users: [{id: 1, name: 'Administrador', role: 'admin', pin: '1234'}, {id: 2, name: 'Cajero 1', role: 'cashier', pin: '1111'}, {id: 3, name: 'Cajero 2', role: 'cashier', pin: '2222'}],
         currentUser: null,
         adminPassword: 'PrismaCore2026',
-        settings: { freeShippingMin: 20, pointRate: 0.1, pointValue: 0.1 }
+        settings: { freeShippingMin: 20, pointRate: 0.1, pointValue: 0.1, bcvRate: 36.00, businessRIF: 'V6977409', businessName: 'FERREAGRO EL CONUCO C.A.', businessAddress: 'Municipio García, Estado Nueva Esparta, Venezuela' }
     },
 
     init() {
@@ -631,6 +738,158 @@ const Store = {
             return true;
         }
         return false;
+    },
+    loginUser(pin) {
+        const user = this.data.users.find(u => u.pin === pin);
+        if (user) {
+            this.data.currentUser = user;
+            this.save();
+            return user;
+        }
+        return null;
+    },
+    logoutUser() {
+        this.data.currentUser = null;
+        this.save();
+    },
+    exportData() {
+        return JSON.stringify(this.data, null, 2);
+    },
+    importData(jsonStr) {
+        try {
+            const parsed = JSON.parse(jsonStr);
+            // Validate basic structure
+            if (parsed.products && parsed.orders && parsed.customers) {
+                this.data = { ...this.data, ...parsed };
+                // Ensure settings has all fields
+                if (!this.data.settings.bcvRate) this.data.settings.bcvRate = 36;
+                if (!this.data.settings.businessRIF) this.data.settings.businessRIF = 'V6977409';
+                this.save();
+                return true;
+            }
+            return false;
+        } catch (e) {
+            return false;
+        }
+    },
+    // ===== CUENTAS POR COBRAR =====
+    addCredit(credit) {
+        credit.id = Date.now();
+        credit.date = new Date().toISOString();
+        credit.payments = credit.payments || [];
+        credit.status = credit.status || 'pending';
+        this.data.credits.push(credit);
+        this.save();
+        return credit;
+    },
+    getCredit(id) { return this.data.credits.find(c => c.id === id); },
+    addCreditPayment(creditId, payment) {
+        const credit = this.getCredit(creditId);
+        if (!credit) return false;
+        payment.id = Date.now();
+        payment.date = new Date().toISOString();
+        credit.payments.push(payment);
+        credit.paidAmount = (credit.paidAmount || 0) + payment.amount;
+        if (credit.paidAmount >= credit.totalAmount) {
+            credit.status = 'paid';
+            credit.paidAmount = credit.totalAmount;
+        } else {
+            credit.status = 'partial';
+        }
+        this.save();
+        return true;
+    },
+    deleteCredit(id) {
+        this.data.credits = this.data.credits.filter(c => c.id !== id);
+        this.save();
+    },
+    // ===== CUENTAS POR PAGAR =====
+    addPayable(payable) {
+        payable.id = Date.now();
+        payable.date = new Date().toISOString();
+        payable.payments = payable.payments || [];
+        payable.status = payable.status || 'pending';
+        this.data.payables.push(payable);
+        this.save();
+        return payable;
+    },
+    getPayable(id) { return this.data.payables.find(p => p.id === id); },
+    addPayablePayment(payableId, payment) {
+        const payable = this.getPayable(payableId);
+        if (!payable) return false;
+        payment.id = Date.now();
+        payment.date = new Date().toISOString();
+        payable.payments.push(payment);
+        payable.paidAmount = (payable.paidAmount || 0) + payment.amount;
+        if (payable.paidAmount >= payable.totalAmount) {
+            payable.status = 'paid';
+            payable.paidAmount = payable.totalAmount;
+        } else {
+            payable.status = 'partial';
+        }
+        this.save();
+        return true;
+    },
+    deletePayable(id) {
+        this.data.payables = this.data.payables.filter(p => p.id !== id);
+        this.save();
+    },
+    // ===== DEVOLUCIONES =====
+    addReturn(ret) {
+        ret.id = Date.now();
+        ret.date = new Date().toISOString();
+        this.data.returns.unshift(ret);
+        // Restore stock
+        ret.items.forEach(item => {
+            const p = this.getProduct(item.productId);
+            if (p) p.stock += item.qty;
+        });
+        // Adjust order total if order exists
+        if (ret.orderId) {
+            const order = this.data.orders.find(o => o.id === ret.orderId);
+            if (order) {
+                order.returnedAmount = (order.returnedAmount || 0) + ret.refundAmount;
+                order.hasReturns = true;
+            }
+        }
+        this.save();
+        return ret;
+    },
+    getReturn(id) { return this.data.returns.find(r => r.id === id); },
+    deleteReturn(id) {
+        const ret = this.getReturn(id);
+        if (ret) {
+            // Reverse stock adjustment
+            ret.items.forEach(item => {
+                const p = this.getProduct(item.productId);
+                if (p) p.stock = Math.max(0, p.stock - item.qty);
+            });
+            // Reverse order adjustment
+            if (ret.orderId) {
+                const order = this.data.orders.find(o => o.id === ret.orderId);
+                if (order) {
+                    order.returnedAmount = Math.max(0, (order.returnedAmount || 0) - ret.refundAmount);
+                    if (order.returnedAmount <= 0) order.hasReturns = false;
+                }
+            }
+        }
+        this.data.returns = this.data.returns.filter(r => r.id !== id);
+        this.save();
+    },
+    // ===== CIERRE DIARIO =====
+    addDailyClosure(closure) {
+        closure.id = Date.now();
+        closure.createdAt = new Date().toISOString();
+        this.data.dailyClosures.unshift(closure);
+        this.save();
+        return closure;
+    },
+    getClosureByDate(dateStr) {
+        return this.data.dailyClosures.find(c => c.date === dateStr);
+    },
+    deleteClosure(id) {
+        this.data.dailyClosures = this.data.dailyClosures.filter(c => c.id !== id);
+        this.save();
     }
 };
 
@@ -673,6 +932,10 @@ function renderHome() {
                         <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full text-white text-sm font-medium mb-6">
                             <span class="w-2 h-2 bg-brand-orange rounded-full animate-pulse"></span>
                             Despacho Gratis en García
+                        </div>
+                        <div class="inline-flex items-center gap-2 bg-brand-orange/90 backdrop-blur px-4 py-2 rounded-full text-white text-sm font-bold mb-6 ml-2 cursor-pointer hover:bg-brand-lightorange transition" onclick="router.navigate('admin')" title="Administrar tasa">
+                            <i class="fas fa-landmark"></i>
+                            <span id="home-bcv-rate">Tasa BCV: ${Store.data.settings.bcvRate ? Store.data.settings.bcvRate.toFixed(2) : '36.00'} Bs/$</span>
                         </div>
                         <h1 class="text-4xl md:text-6xl font-bold text-white leading-tight mb-6">
                             Alimentos de <span class="text-brand-orange">Calidad</span> para tus Animales
@@ -815,7 +1078,7 @@ function renderProductCard(p) {
             </div>
             <p class="text-xs text-gray-500 mb-3">${p.weight}kg • ${p.type === 'mayor' ? 'Venta al Mayor' : 'Venta al Detal'}</p>
             <div class="mt-auto">
-                <div class="flex items-end gap-2 mb-3">
+                <div class="flex items-end gap-2 mb-1">
                     ${isPromo ? `
                         <span class="text-2xl font-bold text-brand-green">$${p.promoPrice.toFixed(2)}</span>
                         <span class="text-sm text-gray-400 line-through">$${p.price.toFixed(2)}</span>
@@ -823,6 +1086,7 @@ function renderProductCard(p) {
                         <span class="text-2xl font-bold text-brand-green">$${p.price.toFixed(2)}</span>
                     `}
                 </div>
+                <p class="text-xs text-brand-orange font-semibold mb-3">≈ ${formatBs(isPromo ? p.promoPrice : p.price)}</p>
                 <div class="flex gap-2">
                     <button onclick="addToCart(${p.id})" class="flex-1 bg-brand-green hover:bg-brand-dark text-white py-2 rounded-lg font-semibold text-sm transition">
                         <i class="fas fa-cart-plus mr-1"></i> Agregar
@@ -848,11 +1112,12 @@ function renderCatalog() {
                     <h3 class="font-bold text-lg mb-4">Filtros</h3>
 
                     <div class="mb-6">
-                        <label class="text-sm font-medium text-gray-700 mb-2 block">Buscar</label>
+                        <label class="text-sm font-medium text-gray-700 mb-2 block">Buscar Producto</label>
                         <div class="relative">
                             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="catalog-search" oninput="filterCatalog()" class="w-full border rounded-lg pl-10 pr-4 py-2 text-sm" placeholder="Nombre del producto...">
+                            <input type="text" id="catalog-search" oninput="filterCatalog()" class="w-full border rounded-lg pl-10 pr-4 py-2 text-sm" placeholder="Escribe para buscar instantáneamente..." autocomplete="off">
                         </div>
+                        <p class="text-xs text-gray-400 mt-1">Busca por nombre, categoría o presentación</p>
                     </div>
 
                     <div class="mb-6">
@@ -1025,8 +1290,9 @@ function renderAdmin() {
                 </div>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium mb-1">Contraseña</label>
-                        <input type="password" id="admin-pass" class="w-full border rounded-lg px-4 py-3" placeholder="••••••••">
+                        <label class="block text-sm font-medium mb-1">PIN de Usuario</label>
+                        <input type="password" id="admin-pass" class="w-full border rounded-lg px-4 py-3 text-center text-2xl tracking-widest" placeholder="••••" maxlength="4" inputmode="numeric">
+                        <p class="text-xs text-gray-400 mt-1 text-center">Admin: 1234 | Cajero 1: 1111 | Cajero 2: 2222</p>
                     </div>
                     <button onclick="loginAdmin()" class="w-full bg-brand-green hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition">
                         <i class="fas fa-lock mr-2"></i>Ingresar
@@ -1041,7 +1307,10 @@ function renderAdmin() {
                     <div class="p-6 border-b border-green-700">
                         <div class="flex items-center gap-2">
                             <svg class="w-8 h-8" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#2D7D32"/><circle cx="50" cy="50" r="44" fill="none" stroke="#FFF8E1" stroke-width="1" opacity="0.25"/><path d="M6 52 Q25 42 50 52 Q75 62 94 52" fill="none" stroke="#1B5E20" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/><path d="M10 60 Q28 50 50 60 Q72 70 90 60" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" opacity="0.5"/><path d="M50 72 L50 38" fill="none" stroke="#4CAF50" stroke-width="3" stroke-linecap="round"/><path d="M50 55 Q35 48 32 40 Q40 46 50 52" fill="#66BB6A"/><path d="M50 48 Q65 41 68 33 Q60 39 50 45" fill="#66BB6A"/><path d="M50 42 Q42 34 44 26 Q48 34 50 38" fill="#81C784"/><ellipse cx="50" cy="30" rx="4.5" ry="9" fill="#F57C00"/><ellipse cx="50" cy="30" rx="2.5" ry="6" fill="#FF9800"/></svg>
-                            <span class="font-bold">Admin</span>
+                            <div>
+                                <span class="font-bold" id="sidebar-user-name">Admin</span>
+                                <p class="text-xs text-green-300" id="sidebar-user-role">Administrador</p>
+                            </div>
                         </div>
                     </div>
                     <nav class="flex-1 p-4 space-y-1">
@@ -1053,6 +1322,11 @@ function renderAdmin() {
                             {id:'customers',icon:'fa-users',label:'Clientes'},
                             {id:'promos',icon:'fa-percent',label:'Promociones'},
                             {id:'balance',icon:'fa-balance-scale',label:'Balance G/P'},
+                            {id:'credits',icon:'fa-hand-holding-usd',label:'Por Cobrar'},
+                            {id:'payables',icon:'fa-file-invoice-dollar',label:'Por Pagar'},
+                            {id:'returns',icon:'fa-undo-alt',label:'Devoluciones'},
+                            {id:'closures',icon:'fa-cash-register',label:'Cierre Caja'},
+                            {id:'reports',icon:'fa-chart-bar',label:'Reportes'},
                             {id:'settings',icon:'fa-cog',label:'Configuración'}
                         ].map(item => `
                             <button onclick="switchAdminTab('${item.id}')" id="tab-${item.id}" class="admin-tab w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3 ${item.id==='dash'?'bg-white/20':''}">
@@ -1068,10 +1342,10 @@ function renderAdmin() {
                 </aside>
 
                 <div class="md:hidden fixed bottom-0 left-0 right-0 bg-brand-dark text-white z-40 flex overflow-x-auto">
-                    ${['dash','inventory','sales','customers','balance'].map(id => `
+                    ${['dash','inventory','sales','credits','balance'].map(id => `
                         <button onclick="switchAdminTab('${id}')" class="flex-1 px-3 py-3 text-center text-xs whitespace-nowrap">
                             <i class="fas fa-${id==='dash'?'chart-line':id==='inventory'?'boxes':id==='sales'?'shopping-bag':id==='customers'?'users':'balance-scale'} block mb-1 text-lg"></i>
-                            ${id==='dash'?'Dash':id==='inventory'?'Inv.':id==='sales'?'Ventas':id==='customers'?'Clientes':'Balance'}
+                            ${id==='dash'?'Dash':id==='inventory'?'Inv.':id==='sales'?'Ventas':id==='credits'?'Cobrar':'Balance'}
                         </button>
                     `).join('')}
                 </div>
@@ -1125,6 +1399,24 @@ const adminTabs = {
                 </div>
                 <p class="text-gray-500 text-sm">Clientes Afiliados</p>
                 <p class="text-2xl font-bold text-brand-dark">${customers}</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-brand-orange/10 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-landmark text-brand-orange text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-sm">Tasa BCV Hoy</p>
+                <p class="text-2xl font-bold text-brand-dark">${Store.data.settings.bcvRate ? Store.data.settings.bcvRate.toFixed(2) : '36.00'} Bs/$</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-undo-alt text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-sm">Devoluciones Hoy</p>
+                <p class="text-2xl font-bold text-brand-dark">${Store.data.returns.filter(r => r.date && r.date.startsWith(new Date().toISOString().split('T')[0])).length}</p>
             </div>
             <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                 <div class="flex items-center justify-between mb-4">
@@ -1204,7 +1496,7 @@ const adminTabs = {
                     </thead>
                     <tbody class="divide-y">
                         ${Store.data.products.map(p => `
-                            <tr class="hover:bg-gray-50 transition ${p.active === false ? 'bg-gray-100 opacity-60' : ''}" data-status="${p.active !== false ? 'active' : 'inactive'}">
+                            <tr class="hover:bg-gray-50 transition">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <span class="text-2xl">${p.image}</span>
@@ -1326,7 +1618,13 @@ const adminTabs = {
     sales() {
         const orders = Store.data.orders;
         return `
-        <h2 class="text-2xl font-bold mb-6 text-brand-dark">Libro de Ventas</h2>
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+            <h2 class="text-2xl font-bold text-brand-dark">Libro de Ventas</h2>
+            <div class="flex items-center gap-2 bg-white rounded-xl shadow-sm border border-gray-100 px-3 py-2">
+                <i class="fas fa-search text-gray-400"></i>
+                <input type="text" id="sales-search" oninput="filterSales()" class="border-none outline-none text-sm w-48" placeholder="Buscar cliente o cédula...">
+            </div>
+        </div>
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
@@ -1342,11 +1640,15 @@ const adminTabs = {
                     </thead>
                     <tbody class="divide-y">
                         ${orders.map(o => `
-                            <tr class="hover:bg-gray-50 transition ${p.active === false ? 'bg-gray-100 opacity-60' : ''}" data-status="${p.active !== false ? 'active' : 'inactive'}">
-                                <td class="px-4 py-4 font-mono font-semibold text-brand-green">${o.number}</td>
+                            <tr class="hover:bg-gray-50 transition ${o.hasReturns ? 'bg-purple-50' : ''}">
+                                <td class="px-4 py-4 font-mono font-semibold text-brand-green">
+                                    ${o.number}
+                                    ${o.hasReturns ? `<span class="ml-2 inline-block px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-[10px] font-bold"><i class="fas fa-undo-alt mr-1"></i>Devolución</span>` : ''}
+                                </td>
                                 <td class="px-4 py-4 text-gray-500">${new Date(o.date).toLocaleDateString()}</td>
                                 <td class="px-4 py-4">
                                     <p class="font-medium">${o.customerName || 'General'}</p>
+                                    <p class="text-xs text-gray-500">${o.customerIdDoc || ''}</p>
                                     <p class="text-xs text-gray-500">${o.customerPhone || ''}</p>
                                 </td>
                                 <td class="px-4 py-4">
@@ -1366,14 +1668,26 @@ const adminTabs = {
                                     </div>
                                     <p class="text-xs text-gray-400 mt-1.5">${o.items.length} producto(s) · ${o.items.reduce((s,i)=>s+i.qty,0)} unidad(es)</p>
                                 </td>
-                                <td class="px-4 py-4 text-right font-bold text-brand-dark">$${o.total.toFixed(2)}</td>
+                                <td class="px-4 py-4 text-right">
+                                    <p class="font-bold text-brand-dark">$${o.total.toFixed(2)}</p>
+                                    <p class="text-xs text-brand-orange font-semibold">${formatBs(o.total)}</p>
+                                </td>
                                 <td class="px-4 py-4 text-center">
                                     <div class="flex flex-col items-center gap-2">
                                         <button onclick="cycleOrderStatus(${o.id})" class="px-2 py-1 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition ${o.status==='completed'?'bg-green-100 text-green-700':o.status==='pending'?'bg-yellow-100 text-yellow-700':'bg-blue-100 text-blue-700'}">
                                             ${o.status==='completed'?'Completado':o.status==='pending'?'Pendiente':'Procesando'} <i class="fas fa-sync-alt ml-1 text-[10px]"></i>
                                         </button>
-                                        <button onclick="openDispatchNote(${o.id})" class="text-brand-green hover:text-brand-dark text-xs font-semibold transition mr-2" title="Generar Nota de Despacho">
+                                        <button onclick="openDispatchNote(${o.id})" class="text-brand-green hover:text-brand-dark text-xs font-semibold transition mr-1" title="Nota de Despacho">
                                             <i class="fas fa-file-invoice mr-1"></i>Despacho
+                                        </button>
+                                        <button onclick="openDispatchNote(${o.id})" class="text-brand-green hover:text-brand-dark text-xs font-semibold transition mr-1" title="Nota de Despacho">
+                                            <i class="fas fa-file-invoice mr-1"></i>Despacho
+                                        </button>
+                                        <button onclick="openFiscalInvoice(${o.id})" class="text-brand-orange hover:text-brand-lightorange text-xs font-semibold transition mr-1" title="Factura Fiscal">
+                                            <i class="fas fa-file-invoice-dollar mr-1"></i>Factura
+                                        </button>
+                                        <button onclick="openReturnModal(${o.id})" class="text-purple-500 hover:text-purple-700 text-xs font-semibold transition mr-1" title="Registrar Devolución">
+                                            <i class="fas fa-undo-alt mr-1"></i>Devolver
                                         </button>
                                         <button onclick="deleteOrderFromAdmin(${o.id})" class="text-red-500 hover:text-red-700 text-xs" title="Anular Venta">
                                             <i class="fas fa-trash mr-1"></i>Anular
@@ -1409,7 +1723,7 @@ const adminTabs = {
                     </thead>
                     <tbody class="divide-y">
                         ${Store.data.purchases.map(p => `
-                            <tr class="hover:bg-gray-50 transition ${p.active === false ? 'bg-gray-100 opacity-60' : ''}" data-status="${p.active !== false ? 'active' : 'inactive'}">
+                            <tr class="hover:bg-gray-50 transition">
                                 <td class="px-6 py-4 text-gray-500">${new Date(p.date).toLocaleDateString()}</td>
                                 <td class="px-6 py-4 font-medium">${p.supplier}</td>
                                 <td class="px-6 py-4">
@@ -1669,7 +1983,67 @@ const adminTabs = {
                     <label class="block text-sm font-medium mb-1">Mínimo para envío gratis ($)</label>
                     <input type="number" id="set-shipping" value="${Store.data.settings.freeShippingMin}" step="1" class="w-full border rounded-lg px-4 py-2">
                 </div>
-                <button onclick="saveSettings()" class="w-full bg-brand-green hover:bg-brand-dark text-white py-2 rounded-lg font-semibold transition">Guardar Configuración</button>
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <h4 class="font-bold text-brand-dark mb-3"><i class="fas fa-landmark mr-2 text-brand-green"></i>Tasa de Cambio BCV</h4>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Tasa Bs por $1 (BCV)</label>
+                        <input type="number" id="set-bcv" value="${Store.data.settings.bcvRate || 36}" step="0.01" class="w-full border rounded-lg px-4 py-2">
+                        <p class="text-xs text-gray-500 mt-1">Ejemplo: 36.50 Bs por cada dólar. Se usa para mostrar precios equivalentes al cliente.</p>
+                    </div>
+                </div>
+                <button onclick="saveSettings()" class="w-full mt-4 bg-brand-green hover:bg-brand-dark text-white py-2 rounded-lg font-semibold transition">Guardar Configuración</button>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <h3 class="font-bold text-lg mb-4 text-brand-dark"><i class="fas fa-building mr-2 text-brand-green"></i>Datos Fiscales del Negocio</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">RIF del Negocio</label>
+                        <input type="text" id="set-rif" value="${Store.data.settings.businessRIF || 'V6977409'}" class="w-full border rounded-lg px-4 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Nombre Fiscal</label>
+                        <input type="text" id="set-business-name" value="${Store.data.settings.businessName || 'FERREAGRO EL CONUCO C.A.'}" class="w-full border rounded-lg px-4 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Dirección Fiscal</label>
+                        <textarea id="set-business-address" rows="2" class="w-full border rounded-lg px-4 py-2">${Store.data.settings.businessAddress || 'Municipio García, Estado Nueva Esparta, Venezuela'}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <h3 class="font-bold text-lg mb-4 text-brand-dark"><i class="fas fa-users-cog mr-2 text-brand-green"></i>Usuarios del Sistema</h3>
+                <div class="space-y-3" id="users-list">
+                    ${Store.data.users.map(u => `
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 ${u.role === 'admin' ? 'bg-brand-green/10 text-brand-green' : 'bg-brand-orange/10 text-brand-orange'} rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-sm">${u.name}</p>
+                                    <p class="text-xs text-gray-500">${u.role === 'admin' ? 'Administrador' : 'Cajero'} · PIN: ${u.pin}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Los cajeros solo ven: Dashboard, Inventario, Ventas, Clientes, Cierre Caja y Por Cobrar.</p>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <h3 class="font-bold text-lg mb-4 text-brand-dark"><i class="fas fa-database mr-2 text-brand-green"></i>Respaldo de Datos</h3>
+                <div class="space-y-3">
+                    <button onclick="exportBackup()" class="w-full bg-brand-green hover:bg-brand-dark text-white py-2 rounded-lg font-semibold transition">
+                        <i class="fas fa-download mr-2"></i>Exportar Respaldo (JSON)
+                    </button>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-brand-green transition cursor-pointer" onclick="document.getElementById('backup-file').click()">
+                        <i class="fas fa-upload text-2xl text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-500">Haz clic para restaurar desde archivo</p>
+                        <input type="file" id="backup-file" class="hidden" accept=".json" onchange="importBackup(this)">
+                    </div>
+                </div>
             </div>
 
             <div class="mt-8 pt-6 border-t">
@@ -1680,6 +2054,528 @@ const adminTabs = {
             </div>
         </div>`;
     }
+};
+
+
+// ==================== ADMIN CREDITS / PAYABLES / CLOSURES / REPORTS ====================
+
+adminTabs.credits = function() {
+    const credits = Store.data.credits;
+    const totalPending = credits.filter(c => c.status !== 'paid').reduce((s, c) => s + (c.balance || 0), 0);
+    const totalOverdue = credits.filter(c => c.status !== 'paid' && new Date(c.dueDate) < new Date()).reduce((s, c) => s + (c.balance || 0), 0);
+
+    return `
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+        <h2 class="text-2xl font-bold text-brand-dark">Cuentas por Cobrar</h2>
+        <div class="flex gap-3">
+            <div class="bg-brand-orange/10 text-brand-orange px-4 py-2 rounded-xl font-bold text-sm">
+                Total Pendiente: $${totalPending.toFixed(2)}
+            </div>
+            ${totalOverdue > 0 ? `<div class="bg-red-100 text-red-600 px-4 py-2 rounded-xl font-bold text-sm"><i class="fas fa-exclamation-circle mr-1"></i>Vencido: $${totalOverdue.toFixed(2)}</div>` : ''}
+        </div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="text-left px-4 py-4 font-semibold">Cliente</th>
+                        <th class="text-left px-4 py-4 font-semibold">Orden</th>
+                        <th class="text-center px-4 py-4 font-semibold">Total</th>
+                        <th class="text-center px-4 py-4 font-semibold">Pagado</th>
+                        <th class="text-center px-4 py-4 font-semibold">Saldo</th>
+                        <th class="text-center px-4 py-4 font-semibold">Vence</th>
+                        <th class="text-center px-4 py-4 font-semibold">Estado</th>
+                        <th class="text-center px-4 py-4 font-semibold">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    ${credits.map(c => {
+                        const isOverdue = c.status !== 'paid' && new Date(c.dueDate) < new Date();
+                        return `
+                        <tr class="hover:bg-gray-50 transition ${isOverdue ? 'bg-red-50' : ''}">
+                            <td class="px-4 py-4">
+                                <p class="font-medium">${c.customerName || 'General'}</p>
+                                <p class="text-xs text-gray-500">${c.customerIdDoc || ''}</p>
+                                <p class="text-xs text-gray-500">${c.customerPhone || ''}</p>
+                            </td>
+                            <td class="px-4 py-4 font-mono text-brand-green font-semibold">${c.orderNumber || ''}</td>
+                            <td class="px-4 py-4 text-center font-bold">$${(c.totalAmount || 0).toFixed(2)}</td>
+                            <td class="px-4 py-4 text-center text-brand-green font-semibold">$${(c.paidAmount || 0).toFixed(2)}</td>
+                            <td class="px-4 py-4 text-center ${isOverdue ? 'text-red-600 font-bold' : 'text-brand-orange font-bold'}">$${(c.balance || 0).toFixed(2)}</td>
+                            <td class="px-4 py-4 text-center text-xs ${isOverdue ? 'text-red-600 font-bold' : 'text-gray-500'}">${c.dueDate ? new Date(c.dueDate).toLocaleDateString('es-VE') : '-'}</td>
+                            <td class="px-4 py-4 text-center">
+                                <span class="px-2 py-1 rounded-full text-xs font-bold ${c.status==='paid'?'bg-green-100 text-green-700':c.status==='partial'?'bg-yellow-100 text-yellow-700':'bg-red-100 text-red-700'}">
+                                    ${c.status==='paid'?'Pagado':c.status==='partial'?'Parcial':'Pendiente'}
+                                </span>
+                            </td>
+                            <td class="px-4 py-4 text-center">
+                                ${c.status !== 'paid' ? `<button onclick="openCreditPaymentModal(${c.id})" class="bg-brand-green hover:bg-brand-dark text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition mr-1"><i class="fas fa-plus mr-1"></i>Abono</button>` : ''}
+                                <button onclick="viewCreditHistory(${c.id})" class="text-gray-500 hover:text-brand-dark text-xs" title="Ver historial"><i class="fas fa-list"></i></button>
+                                <button onclick="deleteCredit(${c.id})" class="text-red-400 hover:text-red-600 text-xs ml-1" title="Eliminar"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                    }).join('') || '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-400">No hay cuentas por cobrar registradas</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="credit-payment-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full fade-in p-6">
+            <h3 class="text-xl font-bold mb-4 text-brand-green">Registrar Abono</h3>
+            <form id="credit-payment-form" onsubmit="saveCreditPayment(event)" class="space-y-4">
+                <input type="hidden" id="cp-credit-id">
+                <div class="p-3 bg-gray-50 rounded-lg mb-2">
+                    <p class="text-xs text-gray-500">Cliente</p>
+                    <p class="font-bold text-sm" id="cp-client-name">-</p>
+                    <p class="text-xs text-gray-500 mt-1">Saldo pendiente</p>
+                    <p class="font-bold text-brand-orange text-lg" id="cp-balance">$0.00</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Monto del Abono ($)</label>
+                    <input type="number" id="cp-amount" step="0.01" required class="w-full border rounded-lg px-4 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Método de Pago</label>
+                    <select id="cp-method" class="w-full border rounded-lg px-4 py-2">
+                        <option value="cash">Efectivo</option>
+                        <option value="pago-movil">Pago Móvil</option>
+                        <option value="transfer">Transferencia</option>
+                        <option value="zelle">Zelle</option>
+                        <option value="binance">Binance</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Referencia / Nota</label>
+                    <input type="text" id="cp-note" class="w-full border rounded-lg px-4 py-2" placeholder="Opcional">
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeCreditPaymentModal()" class="flex-1 border border-gray-300 py-2 rounded-lg">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-brand-green text-white py-2 rounded-lg font-semibold">Registrar Abono</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="credit-history-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full fade-in p-6 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-brand-green">Historial de Pagos</h3>
+                <button onclick="closeCreditHistoryModal()" class="p-2 hover:bg-gray-100 rounded-lg"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="credit-history-content"></div>
+        </div>
+    </div>`;
+};
+
+adminTabs.payables = function() {
+    const payables = Store.data.payables;
+    const totalPending = payables.filter(p => p.status !== 'paid').reduce((s, p) => s + (p.balance || 0), 0);
+
+    return `
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+        <h2 class="text-2xl font-bold text-brand-dark">Cuentas por Pagar</h2>
+        <div class="flex gap-3">
+            <div class="bg-red-100 text-red-600 px-4 py-2 rounded-xl font-bold text-sm">
+                Total Pendiente: $${totalPending.toFixed(2)}
+            </div>
+            <button onclick="openPayableModal()" class="bg-brand-green hover:bg-brand-dark text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
+                <i class="fas fa-plus mr-2"></i>Nueva Deuda
+            </button>
+        </div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="text-left px-4 py-4 font-semibold">Proveedor / Descripción</th>
+                        <th class="text-center px-4 py-4 font-semibold">Total</th>
+                        <th class="text-center px-4 py-4 font-semibold">Pagado</th>
+                        <th class="text-center px-4 py-4 font-semibold">Saldo</th>
+                        <th class="text-center px-4 py-4 font-semibold">Vence</th>
+                        <th class="text-center px-4 py-4 font-semibold">Estado</th>
+                        <th class="text-center px-4 py-4 font-semibold">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    ${payables.map(p => {
+                        const isOverdue = p.status !== 'paid' && new Date(p.dueDate) < new Date();
+                        return `
+                        <tr class="hover:bg-gray-50 transition ${isOverdue ? 'bg-red-50' : ''}">
+                            <td class="px-4 py-4">
+                                <p class="font-medium">${p.supplier || 'General'}</p>
+                                <p class="text-xs text-gray-500">${p.description || ''}</p>
+                            </td>
+                            <td class="px-4 py-4 text-center font-bold">$${(p.totalAmount || 0).toFixed(2)}</td>
+                            <td class="px-4 py-4 text-center text-brand-green font-semibold">$${(p.paidAmount || 0).toFixed(2)}</td>
+                            <td class="px-4 py-4 text-center ${isOverdue ? 'text-red-600 font-bold' : 'text-brand-orange font-bold'}">$${(p.balance || 0).toFixed(2)}</td>
+                            <td class="px-4 py-4 text-center text-xs ${isOverdue ? 'text-red-600 font-bold' : 'text-gray-500'}">${p.dueDate ? new Date(p.dueDate).toLocaleDateString('es-VE') : '-'}</td>
+                            <td class="px-4 py-4 text-center">
+                                <span class="px-2 py-1 rounded-full text-xs font-bold ${p.status==='paid'?'bg-green-100 text-green-700':p.status==='partial'?'bg-yellow-100 text-yellow-700':'bg-red-100 text-red-700'}">
+                                    ${p.status==='paid'?'Pagado':p.status==='partial'?'Parcial':'Pendiente'}
+                                </span>
+                            </td>
+                            <td class="px-4 py-4 text-center">
+                                ${p.status !== 'paid' ? `<button onclick="openPayablePaymentModal(${p.id})" class="bg-brand-green hover:bg-brand-dark text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition mr-1"><i class="fas fa-plus mr-1"></i>Pagar</button>` : ''}
+                                <button onclick="deletePayable(${p.id})" class="text-red-400 hover:text-red-600 text-xs" title="Eliminar"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                    }).join('') || '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-400">No hay cuentas por pagar registradas</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="payable-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full fade-in p-6">
+            <h3 class="text-xl font-bold mb-4 text-brand-green">Registrar Cuenta por Pagar</h3>
+            <form id="payable-form" onsubmit="savePayable(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Proveedor / Acreedor</label>
+                    <input type="text" id="pay-supplier" required class="w-full border rounded-lg px-4 py-2" placeholder="Ej: Distribuidora XYZ">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Descripción</label>
+                    <input type="text" id="pay-desc" class="w-full border rounded-lg px-4 py-2" placeholder="Ej: Compra de maíz a crédito">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Monto Total ($)</label>
+                    <input type="number" id="pay-total" step="0.01" required class="w-full border rounded-lg px-4 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Fecha Límite de Pago</label>
+                    <input type="date" id="pay-due" required class="w-full border rounded-lg px-4 py-2">
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closePayableModal()" class="flex-1 border border-gray-300 py-2 rounded-lg">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-brand-green text-white py-2 rounded-lg font-semibold">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="payable-payment-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full fade-in p-6">
+            <h3 class="text-xl font-bold mb-4 text-brand-green">Registrar Pago</h3>
+            <form id="payable-payment-form" onsubmit="savePayablePayment(event)" class="space-y-4">
+                <input type="hidden" id="pp-payable-id">
+                <div class="p-3 bg-gray-50 rounded-lg mb-2">
+                    <p class="text-xs text-gray-500">Proveedor</p>
+                    <p class="font-bold text-sm" id="pp-supplier-name">-</p>
+                    <p class="text-xs text-gray-500 mt-1">Saldo pendiente</p>
+                    <p class="font-bold text-brand-orange text-lg" id="pp-balance">$0.00</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Monto del Pago ($)</label>
+                    <input type="number" id="pp-amount" step="0.01" required class="w-full border rounded-lg px-4 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Método de Pago</label>
+                    <select id="pp-method" class="w-full border rounded-lg px-4 py-2">
+                        <option value="cash">Efectivo</option>
+                        <option value="pago-movil">Pago Móvil</option>
+                        <option value="transfer">Transferencia</option>
+                        <option value="zelle">Zelle</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Referencia / Nota</label>
+                    <input type="text" id="pp-note" class="w-full border rounded-lg px-4 py-2" placeholder="Opcional">
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closePayablePaymentModal()" class="flex-1 border border-gray-300 py-2 rounded-lg">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-brand-green text-white py-2 rounded-lg font-semibold">Registrar Pago</button>
+                </div>
+            </form>
+        </div>
+    </div>`;
+};
+
+adminTabs.closures = function() {
+    const closures = Store.data.dailyClosures;
+    const today = new Date().toISOString().split('T')[0];
+    const todayClosure = closures.find(c => c.date === today);
+
+    // Calculate today's stats if no closure yet
+    const todayOrders = Store.data.orders.filter(o => o.date && o.date.startsWith(today));
+    const todaySales = todayOrders.reduce((s, o) => s + o.total, 0);
+    const todayCash = todayOrders.filter(o => o.paymentMethod === 'cash' || !o.paymentMethod).reduce((s, o) => s + o.total, 0);
+    const todayPM = todayOrders.filter(o => o.paymentMethod === 'pago-movil').reduce((s, o) => s + o.total, 0);
+    const todayWS = todayOrders.filter(o => o.paymentMethod === 'whatsapp').reduce((s, o) => s + o.total, 0);
+    const todayCredit = todayOrders.filter(o => o.paymentMethod === 'credit').reduce((s, o) => s + o.total, 0);
+    const todayExpenses = Store.data.expenses.filter(e => e.date && e.date.startsWith(today)).reduce((s, e) => s + e.amount, 0);
+    const todayCreditsCollected = Store.data.credits.filter(c => c.payments && c.payments.some(p => p.date && p.date.startsWith(today))).reduce((s, c) => {
+        return s + c.payments.filter(p => p.date && p.date.startsWith(today)).reduce((ps, p) => ps + p.amount, 0);
+    }, 0);
+
+    return `
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+        <h2 class="text-2xl font-bold text-brand-dark">Cierre de Caja</h2>
+        ${!todayClosure ? `<button onclick="openClosureModal()" class="bg-brand-orange hover:bg-brand-lightorange text-white px-4 py-2 rounded-lg font-semibold transition"><i class="fas fa-lock mr-2"></i>Cerrar Caja de Hoy</button>` : `<div class="bg-green-100 text-green-700 px-4 py-2 rounded-xl font-bold text-sm"><i class="fas fa-check-circle mr-1"></i>Caja cerrada hoy</div>`}
+    </div>
+
+    ${!todayClosure ? `
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <p class="text-gray-500 text-sm mb-1">Ventas Hoy (Efectivo)</p>
+            <p class="text-3xl font-bold text-brand-green">$${todayCash.toFixed(2)}</p>
+            <p class="text-xs text-brand-orange mt-1">${formatBs(todayCash)}</p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <p class="text-gray-500 text-sm mb-1">Pago Móvil Hoy</p>
+            <p class="text-3xl font-bold text-brand-green">$${todayPM.toFixed(2)}</p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <p class="text-gray-500 text-sm mb-1">WhatsApp Hoy</p>
+            <p class="text-3xl font-bold text-brand-green">$${todayWS.toFixed(2)}</p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <p class="text-gray-500 text-sm mb-1">Créditos Hoy</p>
+            <p class="text-3xl font-bold text-brand-orange">$${todayCredit.toFixed(2)}</p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <p class="text-gray-500 text-sm mb-1">Cobros de Deudas Hoy</p>
+            <p class="text-3xl font-bold text-blue-600">$${todayCreditsCollected.toFixed(2)}</p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <p class="text-gray-500 text-sm mb-1">Gastos Hoy</p>
+            <p class="text-3xl font-bold text-red-500">-$${todayExpenses.toFixed(2)}</p>
+        </div>
+    </div>
+    ` : ''}
+
+    <h3 class="text-xl font-bold mb-4 text-brand-dark">Historial de Cierres</h3>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="text-left px-4 py-4 font-semibold">Fecha</th>
+                        <th class="text-right px-4 py-4 font-semibold">Ventas</th>
+                        <th class="text-right px-4 py-4 font-semibold">Efectivo</th>
+                        <th class="text-right px-4 py-4 font-semibold">Pago Móvil</th>
+                        <th class="text-right px-4 py-4 font-semibold">Créditos</th>
+                        <th class="text-right px-4 py-4 font-semibold">Gastos</th>
+                        <th class="text-right px-4 py-4 font-semibold">Cierre Real</th>
+                        <th class="text-right px-4 py-4 font-semibold">Diferencia</th>
+                        <th class="text-center px-4 py-4 font-semibold">Notas</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    ${closures.map(c => `
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-4 py-4 font-semibold">${new Date(c.date + 'T00:00:00').toLocaleDateString('es-VE')}</td>
+                            <td class="px-4 py-4 text-right font-bold">$${(c.totalSales || 0).toFixed(2)}</td>
+                            <td class="px-4 py-4 text-right text-brand-green font-semibold">$${(c.salesCash || 0).toFixed(2)}</td>
+                            <td class="px-4 py-4 text-right">$${(c.salesPagoMovil || 0).toFixed(2)}</td>
+                            <td class="px-4 py-4 text-right text-brand-orange">$${(c.salesCredit || 0).toFixed(2)}</td>
+                            <td class="px-4 py-4 text-right text-red-500">-$${(c.expenses || 0).toFixed(2)}</td>
+                            <td class="px-4 py-4 text-right font-bold text-brand-dark">$${(c.closingCash || 0).toFixed(2)}</td>
+                            <td class="px-4 py-4 text-right font-bold ${(c.difference || 0) >= 0 ? 'text-brand-green' : 'text-red-600'}">$${(c.difference || 0).toFixed(2)}</td>
+                            <td class="px-4 py-4 text-center text-xs text-gray-500 max-w-[150px] truncate">${c.notes || '-'}</td>
+                        </tr>
+                    `).join('') || '<tr><td colspan="9" class="px-6 py-8 text-center text-gray-400">No hay cierres registrados</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="closure-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full fade-in p-6 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold mb-4 text-brand-orange"><i class="fas fa-cash-register mr-2"></i>Cierre de Caja - ${new Date().toLocaleDateString('es-VE')}</h3>
+            <form id="closure-form" onsubmit="saveClosure(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-3 bg-brand-green/10 rounded-lg">
+                        <p class="text-xs text-gray-600">Ventas Efectivo</p>
+                        <p class="font-bold text-brand-green">$${todayCash.toFixed(2)}</p>
+                    </div>
+                    <div class="p-3 bg-blue-50 rounded-lg">
+                        <p class="text-xs text-gray-600">Pago Móvil</p>
+                        <p class="font-bold text-blue-600">$${todayPM.toFixed(2)}</p>
+                    </div>
+                    <div class="p-3 bg-green-50 rounded-lg">
+                        <p class="text-xs text-gray-600">WhatsApp</p>
+                        <p class="font-bold text-green-600">$${todayWS.toFixed(2)}</p>
+                    </div>
+                    <div class="p-3 bg-brand-orange/10 rounded-lg">
+                        <p class="text-xs text-gray-600">Ventas a Crédito</p>
+                        <p class="font-bold text-brand-orange">$${todayCredit.toFixed(2)}</p>
+                    </div>
+                    <div class="p-3 bg-purple-50 rounded-lg">
+                        <p class="text-xs text-gray-600">Cobros de Deudas</p>
+                        <p class="font-bold text-purple-600">$${todayCreditsCollected.toFixed(2)}</p>
+                    </div>
+                    <div class="p-3 bg-red-50 rounded-lg">
+                        <p class="text-xs text-gray-600">Gastos</p>
+                        <p class="font-bold text-red-500">-$${todayExpenses.toFixed(2)}</p>
+                    </div>
+                </div>
+                <div class="border-t pt-4">
+                    <p class="text-sm font-bold text-brand-dark mb-2">Efectivo esperado en caja: $${(todayCash + todayCreditsCollected - todayExpenses).toFixed(2)}</p>
+                    <label class="block text-sm font-medium mb-1">Efectivo real contado en caja ($)</label>
+                    <input type="number" id="closure-real-cash" step="0.01" required class="w-full border rounded-lg px-4 py-2" oninput="updateClosurePreview()">
+                </div>
+                <div class="p-3 bg-gray-50 rounded-lg">
+                    <div class="flex justify-between text-sm mb-1"><span>Efectivo esperado:</span><span id="closure-expected">$0.00</span></div>
+                    <div class="flex justify-between text-sm mb-1"><span>Efectivo real:</span><span id="closure-real">$0.00</span></div>
+                    <div class="flex justify-between text-sm font-bold ${(todayCash + todayCreditsCollected - todayExpenses) >= 0 ? 'text-brand-green' : 'text-red-600'}"><span>Diferencia:</span><span id="closure-diff">$0.00</span></div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Notas / Observaciones</label>
+                    <textarea id="closure-notes" rows="2" class="w-full border rounded-lg px-4 py-2" placeholder="Ej: Faltan $5 por cambio mal dado..."></textarea>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeClosureModal()" class="flex-1 border border-gray-300 py-2 rounded-lg">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-brand-orange hover:bg-brand-lightorange text-white py-2 rounded-lg font-semibold">Confirmar Cierre</button>
+                </div>
+            </form>
+        </div>
+    </div>`;
+};
+
+adminTabs.returns = function() {
+    const returns = Store.data.returns;
+    const totalRefunded = returns.reduce((s, r) => s + (r.refundAmount || 0), 0);
+
+    return `
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+        <h2 class="text-2xl font-bold text-brand-dark">Devoluciones</h2>
+        <div class="bg-brand-orange/10 text-brand-orange px-4 py-2 rounded-xl font-bold text-sm">
+            Total Reembolsado: $${totalRefunded.toFixed(2)}
+        </div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="text-left px-4 py-4 font-semibold">Fecha</th>
+                        <th class="text-left px-4 py-4 font-semibold">Orden</th>
+                        <th class="text-left px-4 py-4 font-semibold">Cliente</th>
+                        <th class="text-left px-4 py-4 font-semibold">Productos Devueltos</th>
+                        <th class="text-center px-4 py-4 font-semibold">Motivo</th>
+                        <th class="text-right px-4 py-4 font-semibold">Reembolso</th>
+                        <th class="text-center px-4 py-4 font-semibold">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    ${returns.map(r => `
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-4 py-4 text-gray-500 text-xs">${new Date(r.date).toLocaleDateString('es-VE')} ${new Date(r.date).toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'})}</td>
+                            <td class="px-4 py-4 font-mono font-semibold text-brand-green">${r.orderNumber || '-'}</td>
+                            <td class="px-4 py-4">
+                                <p class="font-medium text-sm">${r.customerName || 'General'}</p>
+                                <p class="text-xs text-gray-500">${r.customerIdDoc || ''}</p>
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="space-y-1">
+                                    ${r.items.map(i => `
+                                        <div class="flex items-center gap-2 text-xs">
+                                            <span class="w-5 h-5 rounded bg-red-100 text-red-600 flex items-center justify-center font-bold">${i.qty}</span>
+                                            <span>${i.name}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </td>
+                            <td class="px-4 py-4 text-center">
+                                <span class="px-2 py-1 rounded-full text-xs font-medium ${r.reason === 'defective' ? 'bg-red-100 text-red-700' : r.reason === 'wrong' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600'}">
+                                    ${r.reason === 'defective' ? 'Defectuoso' : r.reason === 'wrong' ? 'Error Pedido' : r.reason === 'expired' ? 'Vencido' : 'Otro'}
+                                </span>
+                            </td>
+                            <td class="px-4 py-4 text-right font-bold text-brand-orange">$${(r.refundAmount || 0).toFixed(2)}</td>
+                            <td class="px-4 py-4 text-center">
+                                <button onclick="deleteReturn(${r.id})" class="text-red-400 hover:text-red-600 text-xs" title="Eliminar (restaura stock)"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `).join('') || '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-400">No hay devoluciones registradas</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+    </div>`;
+};
+
+adminTabs.reports = function() {
+    // Default to current month
+    const now = new Date();
+    const defaultStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    const defaultEnd = now.toISOString().split('T')[0];
+
+    return `
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-brand-dark mb-4">Reportes por Fecha</h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div class="flex flex-wrap items-end gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Desde</label>
+                    <input type="date" id="rep-start" value="${defaultStart}" class="border rounded-lg px-4 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Hasta</label>
+                    <input type="date" id="rep-end" value="${defaultEnd}" class="border rounded-lg px-4 py-2">
+                </div>
+                <button onclick="generateReport()" class="bg-brand-green hover:bg-brand-dark text-white px-6 py-2 rounded-lg font-semibold transition">
+                    <i class="fas fa-search mr-2"></i>Generar Reporte
+                </button>
+                <button onclick="downloadReportCSV()" class="bg-brand-orange hover:bg-brand-lightorange text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
+                    <i class="fas fa-file-csv mr-1"></i>Exportar CSV
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="report-results" class="hidden">
+        <div class="grid md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <p class="text-gray-500 text-sm mb-1">Ventas Totales</p>
+                <p class="text-3xl font-bold text-brand-green" id="rep-total-sales">$0.00</p>
+                <p class="text-xs text-brand-orange mt-1" id="rep-total-sales-bs">Bs 0,00</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <p class="text-gray-500 text-sm mb-1">Órdenes</p>
+                <p class="text-3xl font-bold text-brand-dark" id="rep-orders-count">0</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <p class="text-gray-500 text-sm mb-1">Ganancia Bruta</p>
+                <p class="text-3xl font-bold text-brand-green" id="rep-gross-profit">$0.00</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <p class="text-gray-500 text-sm mb-1">Gastos</p>
+                <p class="text-3xl font-bold text-red-500" id="rep-expenses">$0.00</p>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h3 class="font-bold text-lg mb-4">Ventas por Método de Pago</h3>
+                <div class="space-y-3" id="rep-by-method"></div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h3 class="font-bold text-lg mb-4">Productos Más Vendidos</h3>
+                <div class="space-y-3" id="rep-top-products"></div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+            <h3 class="font-bold text-lg mb-4">Detalle de Ventas</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b">
+                        <tr>
+                            <th class="text-left px-4 py-3 font-semibold">Fecha</th>
+                            <th class="text-left px-4 py-3 font-semibold">Orden</th>
+                            <th class="text-left px-4 py-3 font-semibold">Cliente</th>
+                            <th class="text-center px-4 py-3 font-semibold">Método</th>
+                            <th class="text-right px-4 py-3 font-semibold">Total</th>
+                            <th class="text-right px-4 py-3 font-semibold">Ganancia</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y" id="rep-detail-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>`;
 };
 
 // ==================== CART FUNCTIONS ====================
@@ -1755,7 +2651,7 @@ function updateCartUI() {
                     ${isImageUrl(item.image) ? `<img src="${item.image}" class="w-12 h-12 rounded-lg object-cover" onerror="handleImageError(this)" data-category="${item.category || ''}">` : `<div class="text-3xl">${item.image || '📦'}</div>`}
                     <div class="flex-1 min-w-0">
                         <h4 class="font-semibold text-sm truncate">${item.name}</h4>
-                        <p class="text-xs text-gray-500">$${item.price.toFixed(2)} c/u</p>
+                        <p class="text-xs text-gray-500">$${item.price.toFixed(2)} c/u · ${formatBs(item.price)}</p>
                         <div class="flex items-center gap-2 mt-2">
                             <button onclick="updateCartQty(${item.productId}, -1)" class="w-6 h-6 rounded-full bg-white border flex items-center justify-center text-xs hover:bg-gray-100">-</button>
                             <span class="text-sm font-semibold w-6 text-center">${item.qty}</span>
@@ -1773,6 +2669,8 @@ function updateCartUI() {
 
     if (subtotalEl) subtotalEl.textContent = '$' + subtotal.toFixed(2);
     if (totalEl) totalEl.textContent = '$' + subtotal.toFixed(2);
+    const cartBsEl = document.getElementById('cart-total-bs');
+    if (cartBsEl) cartBsEl.textContent = formatBs(subtotal);
 }
 
 function toggleCart() {
@@ -1811,6 +2709,8 @@ function closeCheckout() {
 function updateCheckoutTotal() {
     const subtotal = Store.data.cart.reduce((s, i) => s + (i.price * i.qty), 0);
     document.getElementById('checkout-total').textContent = '$' + subtotal.toFixed(2);
+    const totalBsEl = document.getElementById('checkout-total-bs');
+    if (totalBsEl) totalBsEl.textContent = formatBs(subtotal);
 }
 
 function updateShipping() {
@@ -1828,23 +2728,129 @@ function updateShipping() {
     }
 }
 
+
+function toggleCreditFields() {
+    const checked = document.getElementById('co-credit').checked;
+    document.getElementById('credit-fields').classList.toggle('hidden', !checked);
+    if (checked) updateCreditPreview();
+}
+
+function updateCreditPreview() {
+    const subtotal = Store.data.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+    const down = parseFloat(document.getElementById('co-credit-down')?.value || 0);
+    document.getElementById('credit-total').textContent = '$' + subtotal.toFixed(2);
+    document.getElementById('credit-down').textContent = '$' + Math.max(0, down).toFixed(2);
+    document.getElementById('credit-balance').textContent = '$' + Math.max(0, subtotal - down).toFixed(2);
+}
+
 function goToPayment() {
     const name = document.getElementById('co-name').value;
     const phone = document.getElementById('co-phone').value;
+    const idNumber = document.getElementById('co-id-number').value;
     const address = document.getElementById('co-address').value;
 
-    if (!name || !phone || !address) {
-        showToast('Completa todos los campos', 'error');
+    if (!name || !phone || !address || !idNumber) {
+        showToast('Completa todos los campos incluyendo la cédula', 'error');
+        return;
+    }
+
+    const isCredit = document.getElementById('co-credit').checked;
+    if (isCredit) {
+        const dueDate = document.getElementById('co-credit-due').value;
+        if (!dueDate) {
+            showToast('Selecciona la fecha límite de pago para el crédito', 'error');
+            return;
+        }
+        // Skip payment step for credit sales
+        processCreditOrder();
         return;
     }
 
     document.getElementById('checkout-step-1').classList.add('hidden');
     document.getElementById('checkout-step-2').classList.remove('hidden');
+    const subtotal = Store.data.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+    const pmTotalUsd = document.getElementById('pm-total-usd');
+    const pmTotalBs = document.getElementById('pm-total-bs');
+    if (pmTotalUsd) pmTotalUsd.textContent = '$' + subtotal.toFixed(2);
+    if (pmTotalBs) pmTotalBs.textContent = formatBs(subtotal);
 }
 
 function backToStep1() {
     document.getElementById('checkout-step-2').classList.add('hidden');
     document.getElementById('checkout-step-1').classList.remove('hidden');
+}
+
+
+function processCreditOrder() {
+    const name = document.getElementById('co-name').value;
+    const phone = document.getElementById('co-phone').value;
+    const idType = document.getElementById('co-id-type').value;
+    const idNumber = document.getElementById('co-id-number').value;
+    const address = document.getElementById('co-address').value;
+    const municipio = document.getElementById('co-municipio').value;
+    const downPayment = parseFloat(document.getElementById('co-credit-down').value || 0);
+    const dueDate = document.getElementById('co-credit-due').value;
+
+    const subtotal = Store.data.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+    const customer = Store.getCustomerByPhone(phone);
+
+    const order = {
+        customerName: name,
+        customerPhone: phone,
+        customerIdDoc: (idType + '-' + idNumber),
+        customerId: customer ? customer.id : null,
+        address: address,
+        municipio: municipio,
+        items: Store.data.cart.map(i => ({
+            productId: i.productId,
+            name: i.name,
+            qty: i.qty,
+            price: i.price,
+            cost: Store.getProduct(i.productId)?.cost || 0
+        })),
+        total: subtotal,
+        costTotal: Store.data.cart.reduce((s, i) => s + ((Store.getProduct(i.productId)?.cost || 0) * i.qty), 0),
+        status: 'completed',
+        paymentRef: 'CREDITO',
+        paymentMethod: 'credit'
+    };
+
+    const savedOrder = Store.addOrder(order);
+
+    // Create credit record
+    const credit = {
+        orderId: savedOrder.id,
+        orderNumber: savedOrder.number,
+        customerName: name,
+        customerPhone: phone,
+        customerIdDoc: (idType + '-' + idNumber),
+        customerId: customer ? customer.id : null,
+        totalAmount: subtotal,
+        paidAmount: Math.min(downPayment, subtotal),
+        balance: Math.max(0, subtotal - downPayment),
+        dueDate: dueDate,
+        payments: downPayment > 0 ? [{
+            id: Date.now(),
+            date: new Date().toISOString(),
+            amount: Math.min(downPayment, subtotal),
+            method: 'cash',
+            note: 'Abono inicial'
+        }] : []
+    };
+    Store.addCredit(credit);
+
+    Store.data.cart = [];
+    Store.save();
+    updateCartUI();
+
+    document.getElementById('order-number').textContent = savedOrder.number;
+    const orderTotalUsd = document.getElementById('order-total-usd');
+    const orderTotalBs = document.getElementById('order-total-bs');
+    if (orderTotalUsd) orderTotalUsd.textContent = '$' + savedOrder.total.toFixed(2);
+    if (orderTotalBs) orderTotalBs.textContent = formatBs(savedOrder.total);
+    document.getElementById('checkout-step-1').classList.add('hidden');
+    document.getElementById('checkout-success').classList.remove('hidden');
+    setTimeout(() => { openDispatchNote(savedOrder.id); }, 800);
 }
 
 function processPayment() {
@@ -1856,6 +2862,8 @@ function processPayment() {
 
     const name = document.getElementById('co-name').value;
     const phone = document.getElementById('co-phone').value;
+    const idType = document.getElementById('co-id-type').value;
+    const idNumber = document.getElementById('co-id-number').value;
     const address = document.getElementById('co-address').value;
     const municipio = document.getElementById('co-municipio').value;
 
@@ -1867,6 +2875,7 @@ function processPayment() {
     const order = {
         customerName: name,
         customerPhone: phone,
+        customerIdDoc: (idType + '-' + idNumber),
         customerId: customer ? customer.id : null,
         address: address,
         municipio: municipio,
@@ -1890,8 +2899,14 @@ function processPayment() {
     updateCartUI();
 
     document.getElementById('order-number').textContent = savedOrder.number;
+    const orderTotalUsd = document.getElementById('order-total-usd');
+    const orderTotalBs = document.getElementById('order-total-bs');
+    if (orderTotalUsd) orderTotalUsd.textContent = '$' + savedOrder.total.toFixed(2);
+    if (orderTotalBs) orderTotalBs.textContent = formatBs(savedOrder.total);
     document.getElementById('checkout-step-2').classList.add('hidden');
     document.getElementById('checkout-success').classList.remove('hidden');
+    // Auto-open dispatch note after 1 second so user can download/share it
+    setTimeout(() => { openDispatchNote(savedOrder.id); }, 800);
 }
 
 // ==================== AFFILIATE ====================
@@ -1956,25 +2971,51 @@ function checkPoints() {
 // ==================== ADMIN FUNCTIONS ====================
 let currentAdminTab = 'dash';
 let isAdminLoggedIn = false;
+let currentUser = null;
 
 function loginAdmin() {
     const pass = document.getElementById('admin-pass').value;
-    if (pass === Store.data.adminPassword) {
+    const user = Store.loginUser(pass);
+
+    if (user || pass === Store.data.adminPassword) {
         isAdminLoggedIn = true;
+        currentUser = user || { name: 'Admin', role: 'admin' };
         document.getElementById('admin-login').classList.add('hidden');
         document.getElementById('admin-dashboard').classList.remove('hidden');
+
+        // Show user name in sidebar
+        const sidebarUser = document.getElementById('sidebar-user-name');
+        const sidebarRole = document.getElementById('sidebar-user-role');
+        if (sidebarUser) sidebarUser.textContent = currentUser.name;
+        if (sidebarRole) sidebarRole.textContent = currentUser.role === 'admin' ? 'Administrador' : 'Cajero';
+
+        // Hide restricted tabs for cashiers
+        if (currentUser.role === 'cashier') {
+            ['tab-purchases', 'tab-payables', 'tab-balance', 'tab-settings'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+        }
+
         switchAdminTab('dash');
-        showToast('Bienvenido al panel de administración', 'success');
+        showToast('Bienvenido, ' + currentUser.name, 'success');
     } else {
-        showToast('Contraseña incorrecta', 'error');
+        showToast('PIN incorrecto', 'error');
     }
 }
 
 function logoutAdmin() {
     isAdminLoggedIn = false;
+    currentUser = null;
+    Store.logoutUser();
     document.getElementById('admin-login').classList.remove('hidden');
     document.getElementById('admin-dashboard').classList.add('hidden');
     document.getElementById('admin-pass').value = '';
+    // Reset hidden tabs
+    ['tab-purchases', 'tab-payables', 'tab-balance', 'tab-settings'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = '';
+    });
     router.navigate('home');
 }
 
@@ -2239,14 +3280,104 @@ function consultWhatsApp(productId) {
     window.open(`https://wa.me/584123521113?text=${text}`, '_blank');
 }
 
+
+function processCreditOrderWhatsApp(name, phone, idType, idNumber, address, municipio) {
+    const downPayment = parseFloat(document.getElementById('co-credit-down').value || 0);
+    const dueDate = document.getElementById('co-credit-due').value;
+    const subtotal = Store.data.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+
+    let text = `*Pedido a Crédito - Ferreagro El Conuco*%0A%0A`;
+    text += `*Cliente:* ${name}%0A`;
+    text += `*Cédula/RIF:* ${idType}-${idNumber}%0A`;
+    text += `*Teléfono:* ${phone}%0A`;
+    text += `*Dirección:* ${address}%0A`;
+    text += `*Municipio:* ${municipio === 'garcia' ? 'García' : 'Otro'}%0A`;
+    text += `*Forma de Pago:* CRÉDITO / FIADO%0A`;
+    text += `*Fecha Límite:* ${dueDate}%0A%0A`;
+    text += `*Productos:*%0A`;
+    Store.data.cart.forEach((item, idx) => {
+        text += `${idx + 1}. ${item.name} x${item.qty} = $${(item.price * item.qty).toFixed(2)}%0A`;
+    });
+    text += `%0A*Total: $${subtotal.toFixed(2)}*%0A`;
+    text += `*Abono Inicial: $${downPayment.toFixed(2)}*%0A`;
+    text += `*Saldo Pendiente: $${(subtotal - downPayment).toFixed(2)}*%0A`;
+    text += `%0APor favor confirmar. ¡Gracias!`;
+
+    const customer = Store.getCustomerByPhone(phone);
+    const order = {
+        customerName: name,
+        customerPhone: phone,
+        customerIdDoc: (idType + '-' + idNumber),
+        customerId: customer ? customer.id : null,
+        address: address,
+        municipio: municipio,
+        items: Store.data.cart.map(i => ({
+            productId: i.productId,
+            name: i.name,
+            qty: i.qty,
+            price: i.price,
+            cost: Store.getProduct(i.productId)?.cost || 0
+        })),
+        total: subtotal,
+        costTotal: Store.data.cart.reduce((s, i) => s + ((Store.getProduct(i.productId)?.cost || 0) * i.qty), 0),
+        status: 'completed',
+        paymentRef: 'CREDITO-WS',
+        paymentMethod: 'credit'
+    };
+
+    const savedOrder = Store.addOrder(order);
+    const credit = {
+        orderId: savedOrder.id,
+        orderNumber: savedOrder.number,
+        customerName: name,
+        customerPhone: phone,
+        customerIdDoc: (idType + '-' + idNumber),
+        customerId: customer ? customer.id : null,
+        totalAmount: subtotal,
+        paidAmount: Math.min(downPayment, subtotal),
+        balance: Math.max(0, subtotal - downPayment),
+        dueDate: dueDate,
+        payments: downPayment > 0 ? [{
+            id: Date.now(),
+            date: new Date().toISOString(),
+            amount: Math.min(downPayment, subtotal),
+            method: 'cash',
+            note: 'Abono inicial (WhatsApp)'
+        }] : []
+    };
+    Store.addCredit(credit);
+
+    Store.data.cart = [];
+    Store.save();
+    updateCartUI();
+    closeCheckout();
+
+    window.open(`https://wa.me/584123521113?text=${text}`, '_blank');
+    showToast('Pedido a crédito enviado por WhatsApp', 'success');
+    setTimeout(() => { openDispatchNote(savedOrder.id); }, 800);
+}
+
 function checkoutWhatsApp() {
     const name = document.getElementById('co-name').value.trim();
     const phone = document.getElementById('co-phone').value.trim();
+    const idType = document.getElementById('co-id-type').value;
+    const idNumber = document.getElementById('co-id-number').value.trim();
     const address = document.getElementById('co-address').value.trim();
     const municipio = document.getElementById('co-municipio').value;
+    const isCredit = document.getElementById('co-credit').checked;
 
-    if (!name || !phone || !address) {
-        showToast('Completa todos los campos para enviar el pedido por WhatsApp', 'error');
+    if (!name || !phone || !address || !idNumber) {
+        showToast('Completa todos los campos incluyendo la cédula para enviar el pedido por WhatsApp', 'error');
+        return;
+    }
+
+    if (isCredit) {
+        const dueDate = document.getElementById('co-credit-due').value;
+        if (!dueDate) {
+            showToast('Selecciona la fecha límite de pago para el crédito', 'error');
+            return;
+        }
+        processCreditOrderWhatsApp(name, phone, idType, idNumber, address, municipio);
         return;
     }
 
@@ -2259,6 +3390,7 @@ function checkoutWhatsApp() {
 
     let text = `*Nuevo Pedido - Ferreagro El Conuco*%0A%0A`;
     text += `*Cliente:* ${name}%0A`;
+    text += `*Cédula/RIF:* ${idType}-${idNumber}%0A`;
     text += `*Teléfono:* ${phone}%0A`;
     text += `*Dirección:* ${address}%0A`;
     text += `*Municipio:* ${municipio === 'garcia' ? 'García' : 'Otro'}%0A%0A`;
@@ -2273,6 +3405,7 @@ function checkoutWhatsApp() {
     const order = {
         customerName: name,
         customerPhone: phone,
+        customerIdDoc: (idType + '-' + idNumber),
         customerId: null,
         address: address,
         municipio: municipio,
@@ -2298,6 +3431,9 @@ function checkoutWhatsApp() {
 
     window.open(`https://wa.me/584123521113?text=${text}`, '_blank');
     showToast('Pedido enviado por WhatsApp', 'success');
+    // Auto-open dispatch note for the order we just created
+    const lastOrder = Store.data.orders[0];
+    if (lastOrder) setTimeout(() => { openDispatchNote(lastOrder.id); }, 800);
 }
 
 function toggleGlobalPromo() {
@@ -2316,6 +3452,10 @@ function saveSettings() {
     Store.data.settings.pointRate = parseFloat(document.getElementById('set-rate').value);
     Store.data.settings.pointValue = parseFloat(document.getElementById('set-value').value);
     Store.data.settings.freeShippingMin = parseFloat(document.getElementById('set-shipping').value);
+    Store.data.settings.bcvRate = parseFloat(document.getElementById('set-bcv').value);
+    Store.data.settings.businessRIF = document.getElementById('set-rif').value;
+    Store.data.settings.businessName = document.getElementById('set-business-name').value;
+    Store.data.settings.businessAddress = document.getElementById('set-business-address').value;
     Store.save();
     showToast('Configuración guardada', 'success');
 }
@@ -2335,13 +3475,19 @@ function attachCatalogEvents() {
 }
 
 function filterCatalog() {
-    const search = (document.getElementById('catalog-search')?.value || '').toLowerCase();
+    const search = (document.getElementById('catalog-search')?.value || '').toLowerCase().trim();
     const cat = document.querySelector('input[name="cat-filter"]:checked')?.value || 'all';
     const type = document.querySelector('input[name="type-filter"]:checked')?.value || 'all';
     const promoOnly = document.getElementById('promo-only')?.checked || false;
 
     let filtered = Store.data.products.filter(p => {
-        if (search && !p.name.toLowerCase().includes(search)) return false;
+        if (p.active === false) return false;
+        if (search) {
+            const searchTerms = search.split(' ');
+            const productText = (p.name + ' ' + p.category + ' ' + p.presentation + ' ' + p.type).toLowerCase();
+            const matches = searchTerms.every(term => productText.includes(term));
+            if (!matches) return false;
+        }
         if (cat !== 'all' && p.category !== cat) return false;
         if (type !== 'all' && p.type !== type) return false;
         if (promoOnly && !p.promo) return false;
@@ -2350,8 +3496,20 @@ function filterCatalog() {
 
     const grid = document.getElementById('catalog-grid');
     const count = document.getElementById('results-count');
-    if (grid) grid.innerHTML = filtered.map(p => renderProductCard(p)).join('');
-    if (count) count.textContent = filtered.length + ' productos';
+    if (grid) {
+        if (filtered.length === 0) {
+            grid.innerHTML = `
+                <div class="col-span-full text-center py-12">
+                    <i class="fas fa-search text-4xl text-gray-300 mb-3"></i>
+                    <p class="text-gray-400">No se encontraron productos</p>
+                    <button onclick="document.getElementById('catalog-search').value=''; filterCatalog();" class="mt-2 text-brand-green text-sm hover:underline">Limpiar búsqueda</button>
+                </div>
+            `;
+        } else {
+            grid.innerHTML = filtered.map(p => renderProductCard(p)).join('');
+        }
+    }
+    if (count) count.textContent = filtered.length + ' producto' + (filtered.length !== 1 ? 's' : '');
 }
 
 function filterByCategory(cat) {
@@ -2429,6 +3587,7 @@ function openDispatchNote(orderId) {
                 <div>
                     <p class="text-gray-500 mb-1 text-xs uppercase">Cliente</p>
                     <p class="font-bold text-gray-800">${order.customerName || 'Cliente General'}</p>
+                    <p class="text-gray-600">${order.customerIdDoc || ''}</p>
                     <p class="text-gray-600">${order.customerPhone || ''}</p>
                     <p class="text-gray-600 mt-1">${order.address || ''}</p>
                     <p class="text-gray-600">${order.municipio === 'garcia' ? 'Municipio García' : 'Otro municipio'}</p>
@@ -2464,8 +3623,12 @@ function openDispatchNote(orderId) {
                 </tbody>
                 <tfoot>
                     <tr class="bg-brand-cream border-t-2 border-brand-green">
-                        <td colspan="3" class="px-4 py-3 text-right font-bold text-brand-dark">TOTAL:</td>
+                        <td colspan="3" class="px-4 py-3 text-right font-bold text-brand-dark">TOTAL USD:</td>
                         <td class="px-4 py-3 text-right font-bold text-brand-green text-lg">$${order.total.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="px-4 py-2 text-right font-semibold text-brand-orange text-sm">Equivalente BCV:</td>
+                        <td class="px-4 py-2 text-right font-bold text-brand-orange text-sm">${formatBs(order.total)}</td>
                     </tr>
                 </tfoot>
             </table>
@@ -2556,12 +3719,14 @@ function shareDispatchWhatsApp() {
     let text = `*Nota de Despacho - Ferreagro El Conuco*%0A%0A`;
     text += `*Orden:* ${order.number}%0A`;
     text += `*Cliente:* ${order.customerName || 'General'}%0A`;
+    text += `*Cédula/RIF:* ${order.customerIdDoc || 'N/A'}%0A`;
     text += `*Fecha:* ${new Date(order.date).toLocaleDateString('es-VE')}%0A%0A`;
     text += `*Productos:*%0A`;
     order.items.forEach(i => {
         text += `• ${i.name} x${i.qty} = $${(i.price * i.qty).toFixed(2)}%0A`;
     });
-    text += `%0A*Total: $${order.total.toFixed(2)}*%0A`;
+    text += `%0A*Total USD: $${order.total.toFixed(2)}*%0A`;
+    text += `*Equivalente BCV: ${formatBsNoPrefix(order.total)} Bs*%0A`;
     text += `%0A¡Gracias por tu compra! 🐔🐷🐶🐱`;
 
     window.open(`https://wa.me/?text=${text}`, '_blank');
@@ -2585,11 +3750,714 @@ function sendDispatchEmail() {
     window.open(`mailto:?subject=Nota de Despacho ${order.number}&body=${encodeURIComponent(body)}`, '_blank');
 }
 
+
+function formatBs(usdAmount) {
+    const rate = Store.data.settings.bcvRate || 36;
+    const bs = (usdAmount * rate);
+    return 'Bs ' + bs.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function formatBsNoPrefix(usdAmount) {
+    const rate = Store.data.settings.bcvRate || 36;
+    const bs = (usdAmount * rate);
+    return bs.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+
+function filterSales() {
+    const term = (document.getElementById('sales-search')?.value || '').toLowerCase();
+    const rows = document.querySelectorAll('#admin-content tbody tr');
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(term) ? '' : 'none';
+    });
+}
+
+
+// ==================== CREDIT FUNCTIONS ====================
+function openCreditPaymentModal(creditId) {
+    const credit = Store.getCredit(creditId);
+    if (!credit) return;
+    document.getElementById('cp-credit-id').value = creditId;
+    document.getElementById('cp-client-name').textContent = credit.customerName || 'General';
+    document.getElementById('cp-balance').textContent = '$' + (credit.balance || 0).toFixed(2);
+    document.getElementById('cp-amount').value = (credit.balance || 0).toFixed(2);
+    document.getElementById('cp-amount').max = credit.balance || 0;
+    document.getElementById('credit-payment-modal').classList.remove('hidden');
+}
+
+function closeCreditPaymentModal() {
+    document.getElementById('credit-payment-modal').classList.add('hidden');
+}
+
+function saveCreditPayment(e) {
+    e.preventDefault();
+    const creditId = parseInt(document.getElementById('cp-credit-id').value);
+    const amount = parseFloat(document.getElementById('cp-amount').value);
+    const method = document.getElementById('cp-method').value;
+    const note = document.getElementById('cp-note').value;
+
+    if (!amount || amount <= 0) {
+        showToast('Ingresa un monto válido', 'error');
+        return;
+    }
+
+    Store.addCreditPayment(creditId, { amount, method, note });
+    showToast('Abono registrado exitosamente', 'success');
+    closeCreditPaymentModal();
+    switchAdminTab('credits');
+}
+
+function viewCreditHistory(creditId) {
+    const credit = Store.getCredit(creditId);
+    if (!credit) return;
+    const container = document.getElementById('credit-history-content');
+    container.innerHTML = `
+        <div class="space-y-3">
+            <div class="p-3 bg-gray-50 rounded-lg">
+                <p class="text-sm font-bold">${credit.customerName || 'General'}</p>
+                <p class="text-xs text-gray-500">${credit.customerIdDoc || ''}</p>
+                <p class="text-xs text-gray-500">Total: $${(credit.totalAmount || 0).toFixed(2)} | Saldo: $${(credit.balance || 0).toFixed(2)}</p>
+            </div>
+            ${(credit.payments || []).length > 0 ? `
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50"><tr><th class="text-left px-3 py-2">Fecha</th><th class="text-right px-3 py-2">Monto</th><th class="text-left px-3 py-2">Método</th><th class="text-left px-3 py-2">Nota</th></tr></thead>
+                    <tbody class="divide-y">
+                        ${credit.payments.map(p => `
+                            <tr><td class="px-3 py-2 text-xs">${new Date(p.date).toLocaleDateString('es-VE')} ${new Date(p.date).toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'})}</td>
+                            <td class="px-3 py-2 text-right font-bold text-brand-green">$${p.amount.toFixed(2)}</td>
+                            <td class="px-3 py-2 text-xs capitalize">${p.method || 'efectivo'}</td>
+                            <td class="px-3 py-2 text-xs text-gray-500">${p.note || '-'}</td></tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            ` : '<p class="text-gray-400 text-sm text-center py-4">Sin pagos registrados</p>'}
+        </div>
+    `;
+    document.getElementById('credit-history-modal').classList.remove('hidden');
+}
+
+function closeCreditHistoryModal() {
+    document.getElementById('credit-history-modal').classList.add('hidden');
+}
+
+function deleteCredit(id) {
+    if (confirm('¿Eliminar esta cuenta por cobrar? El stock NO se devolverá.')) {
+        Store.deleteCredit(id);
+        showToast('Cuenta por cobrar eliminada', 'success');
+        switchAdminTab('credits');
+    }
+}
+
+// ==================== PAYABLE FUNCTIONS ====================
+function openPayableModal() {
+    document.getElementById('payable-modal').classList.remove('hidden');
+}
+
+function closePayableModal() {
+    document.getElementById('payable-modal').classList.add('hidden');
+    document.getElementById('payable-form').reset();
+}
+
+function savePayable(e) {
+    e.preventDefault();
+    const total = parseFloat(document.getElementById('pay-total').value);
+    const payable = {
+        supplier: document.getElementById('pay-supplier').value,
+        description: document.getElementById('pay-desc').value,
+        totalAmount: total,
+        paidAmount: 0,
+        balance: total,
+        dueDate: document.getElementById('pay-due').value
+    };
+    Store.addPayable(payable);
+    showToast('Cuenta por pagar registrada', 'success');
+    closePayableModal();
+    switchAdminTab('payables');
+}
+
+function openPayablePaymentModal(payableId) {
+    const payable = Store.getPayable(payableId);
+    if (!payable) return;
+    document.getElementById('pp-payable-id').value = payableId;
+    document.getElementById('pp-supplier-name').textContent = payable.supplier || 'General';
+    document.getElementById('pp-balance').textContent = '$' + (payable.balance || 0).toFixed(2);
+    document.getElementById('pp-amount').value = (payable.balance || 0).toFixed(2);
+    document.getElementById('payable-payment-modal').classList.remove('hidden');
+}
+
+function closePayablePaymentModal() {
+    document.getElementById('payable-payment-modal').classList.add('hidden');
+}
+
+function savePayablePayment(e) {
+    e.preventDefault();
+    const payableId = parseInt(document.getElementById('pp-payable-id').value);
+    const amount = parseFloat(document.getElementById('pp-amount').value);
+    const method = document.getElementById('pp-method').value;
+    const note = document.getElementById('pp-note').value;
+
+    if (!amount || amount <= 0) {
+        showToast('Ingresa un monto válido', 'error');
+        return;
+    }
+
+    Store.addPayablePayment(payableId, { amount, method, note });
+    showToast('Pago registrado exitosamente', 'success');
+    closePayablePaymentModal();
+    switchAdminTab('payables');
+}
+
+function deletePayable(id) {
+    if (confirm('¿Eliminar esta cuenta por pagar?')) {
+        Store.deletePayable(id);
+        showToast('Cuenta por pagar eliminada', 'success');
+        switchAdminTab('payables');
+    }
+}
+
+// ==================== CLOSURE FUNCTIONS ====================
+function openClosureModal() {
+    document.getElementById('closure-modal').classList.remove('hidden');
+    updateClosurePreview();
+}
+
+function closeClosureModal() {
+    document.getElementById('closure-modal').classList.add('hidden');
+}
+
+function updateClosurePreview() {
+    const today = new Date().toISOString().split('T')[0];
+    const todayOrders = Store.data.orders.filter(o => o.date && o.date.startsWith(today));
+    const todayCash = todayOrders.filter(o => o.paymentMethod === 'cash' || !o.paymentMethod).reduce((s, o) => s + o.total, 0);
+    const todayCreditsCollected = Store.data.credits.filter(c => c.payments && c.payments.some(p => p.date && p.date.startsWith(today))).reduce((s, c) => {
+        return s + c.payments.filter(p => p.date && p.date.startsWith(today)).reduce((ps, p) => ps + p.amount, 0);
+    }, 0);
+    const todayExpenses = Store.data.expenses.filter(e => e.date && e.date.startsWith(today)).reduce((s, e) => s + e.amount, 0);
+    const expected = todayCash + todayCreditsCollected - todayExpenses;
+    const real = parseFloat(document.getElementById('closure-real-cash')?.value || 0);
+
+    document.getElementById('closure-expected').textContent = '$' + expected.toFixed(2);
+    document.getElementById('closure-real').textContent = '$' + (real || 0).toFixed(2);
+    document.getElementById('closure-diff').textContent = '$' + ((real || 0) - expected).toFixed(2);
+    document.getElementById('closure-diff').className = 'font-bold ' + (((real || 0) - expected) >= 0 ? 'text-brand-green' : 'text-red-600');
+}
+
+function saveClosure(e) {
+    e.preventDefault();
+    const today = new Date().toISOString().split('T')[0];
+    const todayOrders = Store.data.orders.filter(o => o.date && o.date.startsWith(today));
+    const todayCash = todayOrders.filter(o => o.paymentMethod === 'cash' || !o.paymentMethod).reduce((s, o) => s + o.total, 0);
+    const todayPM = todayOrders.filter(o => o.paymentMethod === 'pago-movil').reduce((s, o) => s + o.total, 0);
+    const todayWS = todayOrders.filter(o => o.paymentMethod === 'whatsapp').reduce((s, o) => s + o.total, 0);
+    const todayCredit = todayOrders.filter(o => o.paymentMethod === 'credit').reduce((s, o) => s + o.total, 0);
+    const todayExpenses = Store.data.expenses.filter(e => e.date && e.date.startsWith(today)).reduce((s, e) => s + e.amount, 0);
+    const todayCreditsCollected = Store.data.credits.filter(c => c.payments && c.payments.some(p => p.date && p.date.startsWith(today))).reduce((s, c) => {
+        return s + c.payments.filter(p => p.date && p.date.startsWith(today)).reduce((ps, p) => ps + p.amount, 0);
+    }, 0);
+    const realCash = parseFloat(document.getElementById('closure-real-cash').value || 0);
+    const expectedCash = todayCash + todayCreditsCollected - todayExpenses;
+
+    const closure = {
+        date: today,
+        totalSales: todayOrders.reduce((s, o) => s + o.total, 0),
+        salesCash: todayCash,
+        salesPagoMovil: todayPM,
+        salesWhatsApp: todayWS,
+        salesCredit: todayCredit,
+        creditsCollected: todayCreditsCollected,
+        expenses: todayExpenses,
+        closingCash: realCash,
+        expectedCash: expectedCash,
+        difference: realCash - expectedCash,
+        notes: document.getElementById('closure-notes').value,
+        orderCount: todayOrders.length
+    };
+
+    Store.addDailyClosure(closure);
+    showToast('Cierre de caja registrado exitosamente', 'success');
+    closeClosureModal();
+    switchAdminTab('closures');
+}
+
+// ==================== REPORT FUNCTIONS ====================
+function generateReport() {
+    const start = document.getElementById('rep-start').value;
+    const end = document.getElementById('rep-end').value;
+
+    if (!start || !end) {
+        showToast('Selecciona un rango de fechas', 'error');
+        return;
+    }
+
+    const startDate = new Date(start + 'T00:00:00');
+    const endDate = new Date(end + 'T23:59:59');
+
+    const filteredOrders = Store.data.orders.filter(o => {
+        const d = new Date(o.date);
+        return d >= startDate && d <= endDate;
+    });
+
+    const filteredExpenses = Store.data.expenses.filter(e => {
+        const d = new Date(e.date);
+        return d >= startDate && d <= endDate;
+    });
+
+    const totalSales = filteredOrders.reduce((s, o) => s + o.total, 0);
+    const totalCost = filteredOrders.reduce((s, o) => s + (o.costTotal || o.total * 0.7), 0);
+    const grossProfit = totalSales - totalCost;
+    const totalExpenses = filteredExpenses.reduce((s, e) => s + e.amount, 0);
+
+    // By method
+    const byMethod = {};
+    filteredOrders.forEach(o => {
+        const m = o.paymentMethod || 'cash';
+        byMethod[m] = (byMethod[m] || 0) + o.total;
+    });
+
+    // Top products
+    const productSales = {};
+    filteredOrders.forEach(o => {
+        o.items.forEach(i => {
+            if (!productSales[i.name]) productSales[i.name] = { qty: 0, total: 0 };
+            productSales[i.name].qty += i.qty;
+            productSales[i.name].total += (i.price * i.qty);
+        });
+    });
+    const topProducts = Object.entries(productSales).sort((a, b) => b[1].total - a[1].total).slice(0, 10);
+
+    document.getElementById('rep-total-sales').textContent = '$' + totalSales.toFixed(2);
+    document.getElementById('rep-total-sales-bs').textContent = formatBs(totalSales);
+    document.getElementById('rep-orders-count').textContent = filteredOrders.length;
+    document.getElementById('rep-gross-profit').textContent = '$' + grossProfit.toFixed(2);
+    document.getElementById('rep-expenses').textContent = '$' + totalExpenses.toFixed(2);
+
+    const methodLabels = { cash: 'Efectivo', 'pago-movil': 'Pago Móvil', whatsapp: 'WhatsApp', credit: 'Crédito' };
+    document.getElementById('rep-by-method').innerHTML = Object.entries(byMethod).map(([m, total]) => `
+        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+            <span class="font-medium text-sm">${methodLabels[m] || m}</span>
+            <span class="font-bold">$${total.toFixed(2)}</span>
+        </div>
+    `).join('') || '<p class="text-gray-400 text-sm">Sin datos</p>';
+
+    document.getElementById('rep-top-products').innerHTML = topProducts.map(([name, data], idx) => `
+        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+            <div class="flex items-center gap-3">
+                <span class="w-6 h-6 bg-brand-green text-white rounded-full flex items-center justify-center text-xs font-bold">${idx + 1}</span>
+                <div>
+                    <p class="font-medium text-sm">${name}</p>
+                    <p class="text-xs text-gray-500">${data.qty} unidades</p>
+                </div>
+            </div>
+            <span class="font-bold text-brand-green">$${data.total.toFixed(2)}</span>
+        </div>
+    `).join('') || '<p class="text-gray-400 text-sm">Sin datos</p>';
+
+    document.getElementById('rep-detail-body').innerHTML = filteredOrders.map(o => {
+        const profit = o.total - (o.costTotal || o.total * 0.7);
+        return `
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-xs text-gray-500">${new Date(o.date).toLocaleDateString('es-VE')}</td>
+                <td class="px-4 py-3 font-mono font-semibold text-brand-green">${o.number}</td>
+                <td class="px-4 py-3 text-sm">${o.customerName || 'General'}</td>
+                <td class="px-4 py-3 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${methodLabels[o.paymentMethod] ? 'bg-brand-green/10 text-brand-green' : 'bg-gray-100 text-gray-600'}">${methodLabels[o.paymentMethod] || 'Efectivo'}</span></td>
+                <td class="px-4 py-3 text-right font-bold">$${o.total.toFixed(2)}</td>
+                <td class="px-4 py-3 text-right ${profit >= 0 ? 'text-brand-green' : 'text-red-500'}">$${profit.toFixed(2)}</td>
+            </tr>
+        `;
+    }).join('') || '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400">No hay ventas en este período</td></tr>';
+
+    document.getElementById('report-results').classList.remove('hidden');
+    showToast('Reporte generado', 'success');
+}
+
+let currentReportCSV = '';
+
+function downloadReportCSV() {
+    const start = document.getElementById('rep-start').value;
+    const end = document.getElementById('rep-end').value;
+    const startDate = new Date(start + 'T00:00:00');
+    const endDate = new Date(end + 'T23:59:59');
+
+    const filteredOrders = Store.data.orders.filter(o => {
+        const d = new Date(o.date);
+        return d >= startDate && d <= endDate;
+    });
+
+    let csv = 'Fecha,Orden,Cliente,Cedula,Telefono,Direccion,Metodo,Total,Ganancia\n';
+    filteredOrders.forEach(o => {
+        const profit = o.total - (o.costTotal || o.total * 0.7);
+        csv += `"${new Date(o.date).toLocaleDateString('es-VE')}","${o.number}","${(o.customerName || '').replace(/"/g, '""')}","${o.customerIdDoc || ''}","${o.customerPhone || ''}","${(o.address || '').replace(/"/g, '""')}","${o.paymentMethod || 'cash'}","${o.total.toFixed(2)}","${profit.toFixed(2)}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `Reporte_Ferreagro_${start}_${end}.csv`;
+    link.click();
+    showToast('CSV descargado', 'success');
+}
+
+
+
+// ==================== BACKUP / RESTORE ====================
+function exportBackup() {
+    const data = Store.exportData();
+    const blob = new Blob([data], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    const date = new Date().toISOString().split('T')[0];
+    link.download = `Ferreagro_Backup_${date}.json`;
+    link.click();
+    showToast('Respaldo descargado exitosamente', 'success');
+}
+
+function importBackup(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const success = Store.importData(e.target.result);
+        if (success) {
+            showToast('Datos restaurados exitosamente. Recargando...', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast('Error: archivo inválido o corrupto', 'error');
+        }
+    };
+    reader.readAsText(file);
+    input.value = '';
+}
+
+// ==================== FACTURA FISCAL ====================
+function openFiscalInvoice(orderId) {
+    const order = Store.data.orders.find(o => o.id === orderId);
+    if (!order) return;
+
+    const settings = Store.data.settings;
+    const date = new Date(order.date).toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    const modal = document.createElement('div');
+    modal.id = 'fiscal-modal';
+    modal.className = 'fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4';
+    modal.innerHTML = `
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[95vh] overflow-y-auto fade-in shadow-2xl">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-brand-green"><i class="fas fa-file-invoice mr-2"></i>Factura Fiscal</h2>
+                    <button onclick="document.getElementById('fiscal-modal').remove()" class="p-2 hover:bg-gray-100 rounded-lg transition"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="fiscal-content" class="bg-white border-2 border-dashed border-gray-300 rounded-xl p-2">
+                    <div id="fiscal-printable" class="bg-white p-6" style="font-family: 'Inter', sans-serif;">
+                        <div class="text-center border-b-2 border-brand-green pb-4 mb-6">
+                            <svg class="w-16 h-16 mx-auto mb-2" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#2D7D32"/><circle cx="50" cy="50" r="44" fill="none" stroke="#FFF8E1" stroke-width="1" opacity="0.25"/><path d="M6 52 Q25 42 50 52 Q75 62 94 52" fill="none" stroke="#1B5E20" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/><path d="M10 60 Q28 50 50 60 Q72 70 90 60" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" opacity="0.5"/><path d="M14 68 Q30 58 50 68 Q70 78 86 68" fill="none" stroke="#1B5E20" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/><path d="M50 72 L50 38" fill="none" stroke="#4CAF50" stroke-width="3" stroke-linecap="round"/><path d="M50 55 Q35 48 32 40 Q40 46 50 52" fill="#66BB6A"/><path d="M50 48 Q65 41 68 33 Q60 39 50 45" fill="#66BB6A"/><path d="M50 42 Q42 34 44 26 Q48 34 50 38" fill="#81C784"/><ellipse cx="50" cy="30" rx="4.5" ry="9" fill="#F57C00"/><ellipse cx="50" cy="30" rx="2.5" ry="6" fill="#FF9800"/></svg>
+                            <h1 class="text-2xl font-bold text-brand-green">${settings.businessName || 'FERREAGRO EL CONUCO C.A.'}</h1>
+                            <p class="text-sm text-gray-600 mt-1">RIF: ${settings.businessRIF || 'V6977409'}</p>
+                            <p class="text-xs text-gray-500">${settings.businessAddress || 'Municipio García, Estado Nueva Esparta, Venezuela'}</p>
+                            <p class="text-xs text-gray-500 mt-1">Tel: +58 412-3521113 · ferreagroelconuco@gmail.com</p>
+                            <div class="mt-2 inline-block bg-brand-orange/10 text-brand-orange px-3 py-1 rounded-full text-xs font-bold">CONTRIBUYENTE ORDINARIO - RIMPE</div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-6 mb-6 text-sm">
+                            <div>
+                                <p class="text-gray-500 text-xs uppercase mb-1">Cliente</p>
+                                <p class="font-bold">${order.customerName || 'Cliente General'}</p>
+                                <p class="text-gray-600">${order.customerIdDoc || ''}</p>
+                                <p class="text-gray-600">${order.customerPhone || ''}</p>
+                                <p class="text-gray-600 mt-1">${order.address || ''}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-gray-500 text-xs uppercase mb-1">Factura N°</p>
+                                <p class="font-bold text-xl text-brand-dark">${order.number}</p>
+                                <p class="text-gray-500 text-xs uppercase mt-2 mb-1">Fecha de Emisión</p>
+                                <p class="font-bold">${date}</p>
+                                <p class="text-gray-500 text-xs uppercase mt-2 mb-1">Método de Pago</p>
+                                <p class="font-bold capitalize">${order.paymentMethod === 'credit' ? 'CRÉDITO / FIADO' : order.paymentMethod === 'pago-movil' ? 'Pago Móvil' : order.paymentMethod === 'whatsapp' ? 'WhatsApp' : 'Efectivo'}</p>
+                            </div>
+                        </div>
+
+                        <table class="w-full text-sm mb-6">
+                            <thead class="bg-brand-green text-white">
+                                <tr>
+                                    <th class="text-left px-3 py-2 rounded-tl-lg">Descripción</th>
+                                    <th class="text-center px-3 py-2">Cant.</th>
+                                    <th class="text-right px-3 py-2">P.Unit USD</th>
+                                    <th class="text-right px-3 py-2">P.Unit Bs</th>
+                                    <th class="text-right px-3 py-2 rounded-tr-lg">Total USD</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y border-x border-b border-gray-200">
+                                ${order.items.map((item, idx) => `
+                                    <tr class="${idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}">
+                                        <td class="px-3 py-2 font-medium">${item.name}</td>
+                                        <td class="px-3 py-2 text-center">${item.qty}</td>
+                                        <td class="px-3 py-2 text-right">$${item.price.toFixed(2)}</td>
+                                        <td class="px-3 py-2 text-right text-brand-orange">${formatBsNoPrefix(item.price)}</td>
+                                        <td class="px-3 py-2 text-right font-semibold">$${(item.price * item.qty).toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-brand-cream border-t-2 border-brand-green">
+                                    <td colspan="4" class="px-3 py-2 text-right font-bold text-brand-dark">SUBTOTAL:</td>
+                                    <td class="px-3 py-2 text-right font-bold">$${order.total.toFixed(2)}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="px-3 py-2 text-right font-bold text-brand-dark">TOTAL USD:</td>
+                                    <td class="px-3 py-2 text-right font-bold text-brand-green text-lg">$${order.total.toFixed(2)}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="px-3 py-2 text-right font-semibold text-brand-orange">TOTAL Bs (BCV):</td>
+                                    <td class="px-3 py-2 text-right font-bold text-brand-orange">${formatBsNoPrefix(order.total)} Bs</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <div class="mt-6 p-4 bg-gray-50 rounded-lg text-xs text-gray-500">
+                            <p class="font-bold text-gray-700 mb-1">NOTAS:</p>
+                            <p>· Esta factura sirve como comprobante de compra.</p>
+                            <p>· Los precios están expresados en dólares americanos (USD).</p>
+                            <p>· Tasa BCV aplicada: ${(Store.data.settings.bcvRate || 36).toFixed(2)} Bs/$</p>
+                            <p>· Para devoluciones presentar esta factura dentro de 48 horas.</p>
+                        </div>
+
+                        <div class="mt-6 text-center">
+                            <p class="text-xs text-gray-400">Documento generado electrónicamente · Ferreagro El Conuco</p>
+                            <p class="text-[10px] text-gray-300 mt-1">NO SE ACEPTAN DEVOLUCIONES SIN ESTA FACTURA</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-3 mt-6 justify-center">
+                    <button onclick="downloadFiscalImage()" class="bg-brand-green hover:bg-brand-dark text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
+                        <i class="fas fa-image mr-2"></i>Descargar Imagen
+                    </button>
+                    <button onclick="downloadFiscalPDF()" class="bg-brand-orange hover:bg-brand-lightorange text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
+                        <i class="fas fa-file-pdf mr-2"></i>Descargar PDF
+                    </button>
+                    <button onclick="shareFiscalWhatsApp()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
+                        <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                    </button>
+                    <button onclick="sendFiscalEmail()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
+                        <i class="fas fa-envelope mr-2"></i>Email
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+async function downloadFiscalImage() {
+    const element = document.getElementById('fiscal-printable');
+    if (!element) return;
+    try {
+        const canvas = await html2canvas(element, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+        const link = document.createElement('a');
+        link.download = `Factura_Fiscal_${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Factura descargada', 'success');
+    } catch (err) {
+        showToast('Error al generar imagen', 'error');
+    }
+}
+
+async function downloadFiscalPDF() {
+    const element = document.getElementById('fiscal-printable');
+    if (!element) return;
+    try {
+        const canvas = await html2canvas(element, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, Math.min(pdfHeight, 280));
+        pdf.save(`Factura_Fiscal_${Date.now()}.pdf`);
+        showToast('Factura PDF descargada', 'success');
+    } catch (err) {
+        showToast('Error al generar PDF', 'error');
+    }
+}
+
+function shareFiscalWhatsApp() {
+    const order = Store.data.orders[0]; // Simplified - in real use would need to track current order
+    if (!order) return;
+    const settings = Store.data.settings;
+    let text = `*FACTURA FISCAL - ${settings.businessName || 'FERREAGRO EL CONUCO'}*%0A%0A`;
+    text += `*RIF:* ${settings.businessRIF || 'V6977409'}%0A`;
+    text += `*Orden:* ${order.number}%0A`;
+    text += `*Cliente:* ${order.customerName || 'General'}%0A`;
+    text += `*Cédula:* ${order.customerIdDoc || 'N/A'}%0A%0A`;
+    text += `*Total USD: $${order.total.toFixed(2)}*%0A`;
+    text += `*Total Bs: ${formatBsNoPrefix(order.total)}*%0A%0A`;
+    text += `¡Gracias por su compra! 🌽🐔`;
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+
+function sendFiscalEmail() {
+    const order = Store.data.orders[0];
+    if (!order) return;
+    const settings = Store.data.settings;
+    let body = `Factura Fiscal - ${settings.businessName || 'FERREAGRO EL CONUCO'}
+
+`;
+    body += `RIF: ${settings.businessRIF || 'V6977409'}
+`;
+    body += `Orden: ${order.number}
+`;
+    body += `Cliente: ${order.customerName || 'General'}
+`;
+    body += `Total USD: $${order.total.toFixed(2)}
+`;
+    body += `Total Bs: ${formatBsNoPrefix(order.total)} Bs
+
+`;
+    body += `${settings.businessName || 'FERREAGRO EL CONUCO'}
++58 412-3521113`;
+    window.open(`mailto:?subject=Factura Fiscal ${order.number}&body=${encodeURIComponent(body)}`, '_blank');
+}
+
+// ==================== ALERTAS DE STOCK BAJO ====================
+function checkLowStock() {
+    const lowStock = Store.data.products.filter(p => p.stock < 10 && p.active !== false);
+    if (lowStock.length > 0) {
+        const names = lowStock.slice(0, 3).map(p => p.name).join(', ');
+        const more = lowStock.length > 3 ? ` y ${lowStock.length - 3} más` : '';
+        showToast(`⚠️ Stock bajo: ${names}${more}. Revisa el inventario.`, 'error');
+    }
+}
+
+
+
+// ==================== RETURN / DEVOLUCIÓN FUNCTIONS ====================
+let currentReturnOrderId = null;
+
+function openReturnModal(orderId) {
+    const order = Store.data.orders.find(o => o.id === orderId);
+    if (!order) return;
+    currentReturnOrderId = orderId;
+
+    document.getElementById('ret-order-id').value = orderId;
+
+    // Show order info
+    document.getElementById('return-order-info').innerHTML = `
+        <p class="font-bold text-brand-dark">${order.number}</p>
+        <p class="text-gray-600">${order.customerName || 'Cliente General'} · ${order.customerIdDoc || ''}</p>
+        <p class="text-gray-500 text-xs mt-1">Total original: $${order.total.toFixed(2)} · ${formatBs(order.total)}</p>
+        ${order.hasReturns ? `<p class="text-purple-600 text-xs font-bold mt-1"><i class="fas fa-undo-alt mr-1"></i>Ya tiene devoluciones previas</p>` : ''}
+    `;
+
+    // Build items list with checkboxes
+    const itemsList = document.getElementById('return-items-list');
+    itemsList.innerHTML = order.items.map((item, idx) => `
+        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <input type="checkbox" id="ret-item-${idx}" value="${idx}" class="w-5 h-5 text-purple-600 rounded focus:ring-purple-500" onchange="updateReturnTotal()">
+            <div class="flex-1">
+                <p class="font-semibold text-sm">${item.name}</p>
+                <p class="text-xs text-gray-500">$${item.price.toFixed(2)} c/u · Comprado: ${item.qty} unid.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <label class="text-xs text-gray-500">Cant. a devolver:</label>
+                <input type="number" id="ret-qty-${idx}" min="1" max="${item.qty}" value="1" class="w-16 border rounded-lg px-2 py-1 text-center text-sm" onchange="updateReturnTotal()">
+            </div>
+        </div>
+    `).join('');
+
+    updateReturnTotal();
+    document.getElementById('return-modal').classList.remove('hidden');
+}
+
+function closeReturnModal() {
+    document.getElementById('return-modal').classList.add('hidden');
+    currentReturnOrderId = null;
+    document.getElementById('return-form').reset();
+}
+
+function updateReturnTotal() {
+    const order = Store.data.orders.find(o => o.id === currentReturnOrderId);
+    if (!order) return;
+
+    let refund = 0;
+    order.items.forEach((item, idx) => {
+        const checkbox = document.getElementById(`ret-item-${idx}`);
+        if (checkbox && checkbox.checked) {
+            const qtyInput = document.getElementById(`ret-qty-${idx}`);
+            const qty = parseInt(qtyInput?.value || 1);
+            refund += item.price * Math.min(qty, item.qty);
+        }
+    });
+
+    document.getElementById('ret-refund-total').textContent = '$' + refund.toFixed(2);
+    document.getElementById('ret-refund-bs').textContent = formatBs(refund);
+}
+
+function saveReturn(e) {
+    e.preventDefault();
+    const order = Store.data.orders.find(o => o.id === currentReturnOrderId);
+    if (!order) return;
+
+    const selectedItems = [];
+    let refundAmount = 0;
+
+    order.items.forEach((item, idx) => {
+        const checkbox = document.getElementById(`ret-item-${idx}`);
+        if (checkbox && checkbox.checked) {
+            const qtyInput = document.getElementById(`ret-qty-${idx}`);
+            const qty = parseInt(qtyInput?.value || 1);
+            const actualQty = Math.min(qty, item.qty);
+            if (actualQty > 0) {
+                selectedItems.push({
+                    productId: item.productId,
+                    name: item.name,
+                    qty: actualQty,
+                    price: item.price
+                });
+                refundAmount += item.price * actualQty;
+            }
+        }
+    });
+
+    if (selectedItems.length === 0) {
+        showToast('Selecciona al menos un producto para devolver', 'error');
+        return;
+    }
+
+    const ret = {
+        orderId: order.id,
+        orderNumber: order.number,
+        customerName: order.customerName,
+        customerIdDoc: order.customerIdDoc,
+        customerPhone: order.customerPhone,
+        items: selectedItems,
+        refundAmount: refundAmount,
+        reason: document.getElementById('ret-reason').value,
+        notes: document.getElementById('ret-notes').value
+    };
+
+    Store.addReturn(ret);
+    showToast(`Devolución registrada: $${refundAmount.toFixed(2)} reembolsados. Stock restaurado.`, 'success');
+    closeReturnModal();
+    switchAdminTab('sales');
+}
+
+function deleteReturn(id) {
+    if (confirm('¿Eliminar esta devolución? El stock se revertirá y el reembolso se descontará.')) {
+        Store.deleteReturn(id);
+        showToast('Devolución eliminada. Stock revertido.', 'info');
+        switchAdminTab('returns');
+    }
+}
+
+
 // ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', () => {
     Store.init();
     updateCartUI();
     render();
+    // Check low stock after a delay
+    setTimeout(checkLowStock, 2000);
 });
 </script>
 
