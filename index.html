@@ -2,7 +2,10 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
     <title>Ferreagro El Conuco - Alimentos para Animales</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -51,7 +54,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
-<body class="bg-gray-50 font-sans text-gray-800">
+<body class="bg-gray-50 font-sans text-gray-800" ontouchstart="">
+    <!-- iOS Safari fix: ontouchstart enables :active states -->
 
 <div id="app">
 
@@ -463,6 +467,39 @@
         </div>
     </div>
 </div><script>
+// ==================== SAFARI / IOS localStorage FIX ====================
+// Safari en iPad/iPhone tiene problemas con localStorage en modo privado
+// y a veces lanza QuotaExceededError. Este wrapper detecta y usa fallback.
+(function() {
+    const testKey = '__ferreagro_test__';
+    let storageWorks = false;
+    try {
+        localStorage.setItem(testKey, '1');
+        localStorage.removeItem(testKey);
+        storageWorks = true;
+    } catch (e) {
+        console.warn('localStorage no disponible, usando memoria fallback');
+    }
+
+    if (!storageWorks) {
+        // Crear fallback en memoria que simula localStorage
+        window.__memoryStorage = {};
+        const fakeStorage = {
+            getItem: function(key) { return window.__memoryStorage[key] || null; },
+            setItem: function(key, value) { window.__memoryStorage[key] = String(value); },
+            removeItem: function(key) { delete window.__memoryStorage[key]; },
+            clear: function() { window.__memoryStorage = {}; },
+            get length() { return Object.keys(window.__memoryStorage).length; },
+            key: function(n) { return Object.keys(window.__memoryStorage)[n] || null; }
+        };
+        Object.defineProperty(window, 'localStorage', {
+            value: fakeStorage,
+            writable: false,
+            configurable: false
+        });
+    }
+})();
+
 // ==================== IMAGE SYSTEM ====================
 
 const DEFAULT_PRODUCT_IMAGE = 'https://placehold.co/600x600/F3F4F6/2D7D32?text=FERREAGRO';
@@ -558,10 +595,19 @@ const Store = {
     },
 
     init() {
-        const saved = localStorage.getItem('ferreagro_data');
+        let saved = null;
+        try {
+            saved = localStorage.getItem('ferreagro_data');
+        } catch (e) {
+            console.warn('Error leyendo localStorage:', e);
+        }
         if (saved) {
-            const parsed = JSON.parse(saved);
-            this.data = { ...this.data, ...parsed };
+            try {
+                const parsed = JSON.parse(saved);
+                this.data = { ...this.data, ...parsed };
+            } catch (e) {
+                console.error('Error parseando datos guardados:', e);
+            }
         }
         
         // MIGRATION SCRIPT FOR OLD DATA:
@@ -610,7 +656,24 @@ const Store = {
         this.save();
     },
 
-    save() { localStorage.setItem('ferreagro_data', JSON.stringify(this.data)); },
+    save() { 
+        try {
+            localStorage.setItem('ferreagro_data', JSON.stringify(this.data));
+        } catch (e) {
+            console.warn('Error guardando en localStorage:', e);
+            // En Safari con límite de quota, intentamos limpiar y reintentar
+            if (e.name === 'QuotaExceededError' || e.code === 22) {
+                try {
+                    // Intentar con compresión básica
+                    const compressed = JSON.stringify(this.data);
+                    localStorage.clear();
+                    localStorage.setItem('ferreagro_data', compressed);
+                } catch (e2) {
+                    console.error('No se pudo guardar datos:', e2);
+                }
+            }
+        }
+    },
     getProducts() { return this.data.products; },
     getProduct(id) { return this.data.products.find(p => p.id === id); },
     updateProduct(id, updates) {
